@@ -45,7 +45,7 @@ export default function LoadingScreen() {
   /* ───────── NAVIGATE AFTER FADE ───────── */
   useEffect(() => {
     if (!exiting) return;
-    const t = setTimeout(() => navigate("/"), 700);
+    const t = setTimeout(() => 900);
     return () => clearTimeout(t);
   }, [exiting, navigate]);
 

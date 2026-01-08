@@ -299,8 +299,8 @@ useEffect(() => {
           sx: {
             width: "100%",
             background:
-              "linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05))",
-            backdropFilter: "blur(20px)",
+              "linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))",
+            backdropFilter: "blur(40px) brightness(1.95)",
           },
         }}
       >
@@ -316,7 +316,7 @@ useEffect(() => {
             <Typography
               key={item.id}
               tabIndex={0}
-              onClick={() => scrollTo(item.id)}
+              onClick={() => handleNavClick(item)}
               sx={{
                 py: 1.6,
                 fontSize: 16,
