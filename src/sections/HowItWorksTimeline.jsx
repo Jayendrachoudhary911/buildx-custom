@@ -166,16 +166,24 @@ function TimelineStep({ item, index }) {
           }}
         >
           <motion.div variants={dotVariants}>
-            <Box
-              sx={{
-                width: 16,
-                height: 16,
-                borderRadius: "50%",
-                background: "#fff",
-                boxShadow:
-                  "0 0 0 8px rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.6)",
-              }}
-            />
+              <Box
+                sx={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: "50%",
+                  background: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                
+                  boxShadow:
+                    "0 0 0 8px rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.6)",
+                
+                  color: "#000", // icon color
+                }}
+              >
+                <Icon size={14} strokeWidth={2.2} />
+              </Box>
           </motion.div>
         </Box>
 

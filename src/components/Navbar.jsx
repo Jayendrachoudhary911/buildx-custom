@@ -6,15 +6,17 @@ import {
   Drawer,
   IconButton,
   Avatar,
+  SwipeableDrawer,
 } from "@mui/material";
 import { Menu, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { label: "About", id: "about" },
-  { label: "Events", id: "events" },
-  { label: "How It Works", id: "how-it-works" },
-  { label: "FAQs", id: "faqs" },
+  { label: "Home", id: "/" },
+  { label: "Events", id: "/events" },
+  { label: "Your Team", id: "/your-team" },
+  { label: "Contact Us", id: "/contact-us" },
 ];
 
 export default function Navbar() {
@@ -28,6 +30,31 @@ export default function Navbar() {
   const indicatorRef = useRef(null);
   const itemRefs = useRef({});
   const hoverOffset = useRef(0);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavClick = (item) => {
+    // ROUTE navigation
+    if (item.id.startsWith("/")) {
+      navigate(item.id);
+      return;
+    }
+
+    // SECTION scroll (only works on home)
+    if (location.pathname !== "/") {
+      navigate("/", { replace: false });
+      setTimeout(() => {
+        document
+          .getElementById(item.id)
+          ?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      document
+        .getElementById(item.id)
+        ?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   useLayoutEffect(() => {
   const el = itemRefs.current[active];
@@ -175,7 +202,7 @@ useEffect(() => {
   <Typography
     key={item.id}
     tabIndex={0}
-    onClick={() => scrollTo(item.id)}
+    onClick={() => handleNavClick(item)}
     onKeyDown={(e) => onKeyDown(e, i)}
 
     onMouseMove={(e) => {
@@ -264,15 +291,15 @@ useEffect(() => {
       </Box>
 
       {/* ───────── MOBILE DRAWER ───────── */}
-      <Drawer
+      <SwipeableDrawer
         anchor="right"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         PaperProps={{
           sx: {
-            width: "75%",
+            width: "100%",
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.75))",
+              "linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05))",
             backdropFilter: "blur(20px)",
           },
         }}
@@ -302,7 +329,7 @@ useEffect(() => {
             </Typography>
           ))}
         </Box>
-      </Drawer>
+      </SwipeableDrawer>
     </>
   );
 }

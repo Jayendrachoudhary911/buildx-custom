@@ -15,6 +15,11 @@ export default function AppBackground({ children }) {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
+        backgroundColor: `
+            radial-gradient(circle at 30% 50%, rgba(131, 87, 43, 0.74) 0%, transparent 60%),
+            radial-gradient(circle at 80% 80%, rgba(79, 38, 8, 0.2) 0%, transparent 50%),
+            linear-gradient(180deg, rgba(183, 151, 122, 0.66) 0%, rgba(255, 235, 220, 0.18) 100%)
+          `,
 
         /* 🌫 OVERLAY FOR READABILITY */
         "&::before": {
@@ -22,7 +27,8 @@ export default function AppBackground({ children }) {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.85))",
+            "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.4))",
+          backdropFilter: "saturate(1.9) brightness(1.95) blur(30px)",
           zIndex: 0,
         },
 
@@ -31,8 +37,6 @@ export default function AppBackground({ children }) {
           content: '""',
           position: "absolute",
           inset: 0,
-          background:
-            "repeating-radial-gradient(circle, rgba(255,255,255,0.03) 0 1px, transparent 1px 3px)",
           mixBlendMode: "overlay",
           pointerEvents: "none",
           zIndex: 0,

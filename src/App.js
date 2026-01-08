@@ -5,6 +5,11 @@ import LoadingScreen from "./components/LoadingScreen";
 import IntroFlow from "./pages/IntroFlow";
 import Home from "./pages/Home";
 import AppBackground from "./components/AppBackground";
+import ContactUs from "./pages/ContactUs";
+import EventsPage from "./pages/Events";
+
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 export default function App() {
   const [booting, setBooting] = useState(true);
@@ -27,10 +32,14 @@ export default function App() {
 
   return (
     <AppBackground>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="*" element={<Home />} />
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="/contact-us" element={<ContactUs />} />
       </Routes>
+      <Footer />
 
       {showIntro && (
         <IntroFlow
