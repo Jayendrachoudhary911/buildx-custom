@@ -406,31 +406,66 @@ const IconLabel = ({ icon: Icon, label, value }) => (
 /* ───────── 4. EVENT DETAILS DIALOG ───────── */
 function EventDetailsDialog({ open, event, onClose, Transition }) {
   const [expanded, setExpanded] = useState(false);
+const liveItemRef = useRef(null);
+const todayHeaderRef = useRef(null);
 
-  // ✅ EARLY EXIT FIRST
+const [collapsedDays, setCollapsedDays] = useState(() => new Set());
+
+useEffect(() => {
+  if (liveItemRef.current) {
+    liveItemRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  } else if (todayHeaderRef.current) {
+    todayHeaderRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+}, []);
+
+
+const groupedTimeline = useMemo(() => {
+    if (!event?.timeline) return [];
+
+    // 1. Normalize strings to Date objects
+    const normalized = event.timeline
+      .map((item) => {
+        const startObj = new Date(item.start);
+        const endObj = new Date(item.end);
+        
+        if (isNaN(startObj.getTime())) return null;
+
+        return { 
+          ...item, 
+          startObj, 
+          endObj,
+          // Use start date as the grouping key (YYYY-MM-DD)
+          dateKey: startObj.toISOString().split("T")[0] 
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.startObj - b.startObj);
+
+    // 2. Group by dateKey
+    const groups = {};
+    normalized.forEach((item) => {
+      if (!groups[item.dateKey]) groups[item.dateKey] = [];
+      groups[item.dateKey].push(item);
+    });
+
+    return Object.entries(groups).map(([dateKey, items]) => ({
+      dateKey,
+      dateObj: items[0].startObj,
+      items,
+      // The start of the first item and end of the last item defines the day's range
+      dayStart: items[0].startObj,
+      dayEnd: items[items.length - 1].endObj,
+    }));
+  }, [event]);
+
   if (!event) return null;
-
-  // ✅ SAFE AFTER THIS POINT
-  const today = new Date();
-
-  const timelineDates = event.timeline
-    .map((i) => new Date(i.date))
-    .filter((d) => !isNaN(d));
-
-  const timelineStart = Math.min(...timelineDates);
-  const timelineEnd = Math.max(...timelineDates);
-
-  const progress =
-    timelineEnd > timelineStart
-      ? Math.min(
-          1,
-          Math.max(
-            0,
-            (today.getTime() - timelineStart) /
-              (timelineEnd - timelineStart)
-          )
-        )
-      : 0;
 
   return (
     <Dialog
@@ -581,188 +616,223 @@ function EventDetailsDialog({ open, event, onClose, Transition }) {
         The Road Ahead
       </Typography>
 
+<Box sx={{ position: "relative", mt: 6 }}>
+  {groupedTimeline.map((group) => {
+    const now = Date.now();
+
+    const isDayLive =
+      now >= group.dayStart.getTime() &&
+      now <= group.dayEnd.getTime();
+
+    const isDayPast = now > group.dayEnd.getTime();
+
+    const isCollapsed = isDayPast && !isDayLive && collapsedDays.has(group.dateKey);
+
+    /* DAY PROGRESS */
+    let dayProgress = 0;
+    if (now > group.dayEnd.getTime()) dayProgress = 1;
+    else if (now > group.dayStart.getTime()) {
+      dayProgress =
+        (now - group.dayStart.getTime()) /
+        (group.dayEnd.getTime() - group.dayStart.getTime());
+    }
+
+    return (
+      <Box key={group.dateKey} sx={{ mb: 10 }}>
+        {/* ───── DATE HEADER ───── */}
         <Box
+          ref={isDayLive ? todayHeaderRef : null}
+          onClick={() => {
+            if (!isDayPast) return;
+            setCollapsedDays((prev) => {
+              const next = new Set(prev);
+              next.has(group.dateKey)
+                ? next.delete(group.dateKey)
+                : next.add(group.dateKey);
+              return next;
+            });
+          }}
           sx={{
-            display: "block",
-            position: "relative",
-            left: 32,
-            top: 0,
-            bottom: 0,
-            width: { xs: 320, lg: 440 },
+            position: "sticky",
+            top: 12,
+            zIndex: 6,
+            width: 320,
+            mb: 3,
+            px: 1,
+            py: 1,
+            pl: 3,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: 2,
+            backdropFilter: "blur(20px)",
+            color: "#000000",
+            bgcolor: "rgba(203, 203, 203, 1)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            boxShadow: "0 12px 40px rgba(255, 255, 255, 0.27)",
+            cursor: isDayPast ? "pointer" : "default",
           }}
         >
+          <Typography
+            sx={{
+              fontWeight: 900,
+              letterSpacing: "0.12em",
+              fontSize: 13,
+              textTransform: "uppercase",
+            }}
+          >
+            {group.dateObj.toLocaleDateString("en-US", {
+              weekday: "long",
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}
+          </Typography>
 
-{/* BASE LINE */}
-<Box
-  sx={{
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 2,
-    transform: "translateX(-50%)",
-    background: "rgba(255,255,255,0.15)",
-  }}
-/>
-
-{/* PROGRESS LINE */}
-<Box
-  sx={{
-    position: "absolute",
-    left: 0,
-    top: 0,
-    width: 2,
-    height: `${progress * 100}%`,
-    transform: "translateX(-50%)",
-    background: "linear-gradient(to top, #ffffff, rgba(255, 255, 255, 0.2))",
-    boxShadow: "0 0 20px rgba(255, 255, 255, 0.6)",
-    transition: "height 1.2s cubic-bezier(.16,1,.3,1)",
-  }}
-/>
-
-
-{event.timeline.map((item, idx) => {
-  const dateObj = item.date
-    ? new Date(
-        item.date.includes("T")
-          ? item.date
-          : `${item.date}T00:00:00+05:30`
-      )
-    : null;
-
-const isToday =
-  dateObj &&
-  dateObj.toDateString() === today.toDateString();
-
-  return (
-    <Box
-      key={idx}
-      sx={{
-        display: "grid",
-        alignItems: "center",
-        mb: 6,
-        position: "relative",
-      }}
-    >
-      {/* CONTENT */}
-      <Box
-        sx={{
-          pl: 6,
-          pr: 1,
-          py: 3,
-          maxWidth: 520,
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: 11,
-            letterSpacing: "0.3em",
-            opacity: 0.6,
-            mb: 0.8,
-          }}
-        >
-          {item.day}
-        </Typography>
-
-        <Typography
-          sx={{
-            fontSize: { xs: 16, md: 18 },
-            fontWeight: 600,
-            mb: 1,
-          }}
-        >
-          {item.title}
-        </Typography>
-
-        <Typography
-          sx={{
-            fontSize: 14.5,
-            lineHeight: 1.75,
-            opacity: 0.78,
-          }}
-        >
-          {item.desc}
-        </Typography>
-      </Box>
-
-      {/* DATE DOT */}
-      <Box
-        sx={{
-          position: "absolute",
-          left: -22,
-        }}
-      >
-<Box
-  sx={{
-    width: 46,
-    height: 56,
-    borderRadius: 0.6,
-    background: isToday ? "#ffffffff" : "#d4d4d4ff",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "2px",
-    backdropFilter: "blur(20px)",
-    WebkitBackdropFilter: "blur(20px)",
-    boxShadow: isToday
-      ? "0 0 0 10px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 255, 255, 0.9)"
-      : "0 0 0 8px rgba(255, 255, 255, 0), 0 0 20px rgba(255,255,255,0)",
-
-    animation: isToday
-      ? "pulse 2s ease-in-out infinite"
-      : "none",
-
-    "@keyframes pulse": {
-      "0%": {
-        boxShadow:
-          "0 0 0 0 rgba(255, 255, 255, 0.6)",
-      },
-      "70%": {
-        boxShadow:
-          "0 0 0 16px rgba(108,255,142,0)",
-      },
-      "100%": {
-        boxShadow:
-          "0 0 0 0 rgba(108,255,142,0)",
-      },
-    },
-  }}
->
-
-          {dateObj && (
-            <>
-              <Typography
-                sx={{
-                  fontSize: 18,
-                  fontWeight: 900,
-                  color: "#000000ff",
-                  lineHeight: 1,
-                }}
-              >
-                {dateObj.toLocaleDateString("en-US", { day: "2-digit" })}
-              </Typography>
-
-              <Typography
-                sx={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  opacity: 0.75,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "#272727ff",
-                }}
-              >
-                {dateObj.toLocaleDateString("en-US", { month: "short" })}
-              </Typography>
-            </>
-          )}
+          {isDayLive ? (
+            <Box
+              sx={{
+                px: 2,
+                py: 0.6,
+                borderRadius: 999,
+                fontSize: 10,
+                fontWeight: 900,
+                bgcolor: "#6CFF8E",
+                color: "#000",
+                animation: "pulse 1.6s infinite",
+                "@keyframes pulse": {
+                  "0%": { boxShadow: "0 0 0 0 rgba(108,255,142,0.6)" },
+                  "70%": { boxShadow: "0 0 0 14px rgba(108,255,142,0)" },
+                  "100%": { boxShadow: "0 0 0 0 rgba(108,255,142,0)" },
+                },
+              }}
+            >
+              LIVE NOW
+            </Box>
+          ) : isDayPast ? (
+            <Typography sx={{ opacity: 0.6, fontSize: 12 }}>
+              Completed · {isCollapsed ? "Expand" : "Collapse"}
+            </Typography>
+          ) : null}
         </Box>
-      </Box>
-    </Box>
-  );
-})}
 
+          {/* Verticle Line */}
+            <Box
+              sx={{
+                position: "absolute",
+                left: 78,   
+                top: 0,
+                bottom: 0,
+                width: 6,
+                bgcolor: "rgba(255, 255, 255, 0.06)",
+              }}
+            />
+
+        {/* ───── DAY PROGRESS ───── */}
+        {/* {!isCollapsed && (
+          <Box
+            sx={{
+                position: "absolute",
+                left: 78,   
+                top: 0,
+                bottom: 0,
+              width: 6,
+              borderRadius: 999,
+              mb: 6,
+              background: "rgba(255,255,255,0.12)",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              sx={{
+                height: "100%",
+                width: `${dayProgress * 100}%`,
+                background:
+                  "linear-gradient(90deg,#6CFF8E,#ffffff)",
+                transition: "width 1s cubic-bezier(.16,1,.3,1)",
+              }}
+            />
+          </Box>
+        )} */}
+
+        {/* ───── TIMELINE BODY ───── */}
+        {!isCollapsed && (
+          <Box sx={{ position: "relative", pl: 6 }}>
+            {group.items.map((item, i) => {
+              const isItemLive =
+                now >= item.startObj.getTime() &&
+                now <= item.endObj.getTime();
+
+              return (
+                <Box
+                  key={i}
+                  ref={isItemLive ? liveItemRef : null}
+                  sx={{
+                    display: "flex",
+                    gap: 4,
+                    mb: 6,
+                    position: "relative",
+                    opacity: now > item.endObj.getTime() ? 0.45 : 1,
+                  }}
+                >
+                  {/* TIME NODE */}
+                  <Box
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 900,
+                      fontSize: 12,
+                      bgcolor: isItemLive ? "#6CFF8E" : "#fff",
+                      color: "#000",
+                      boxShadow: isItemLive
+                        ? "0 0 0 10px rgba(108,255,142,0.25), 0 0 30px rgba(108,255,142,0.8)"
+                        : "0 0 20px rgba(255,255,255,0.5)",
+                    }}
+                  >
+                    {item.startObj.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Box>
+
+                  {/* CONTENT */}
+                  <Box sx={{ pt: 0.5 }}>
+                    <Typography sx={{ fontWeight: 800, fontSize: 17 }}>
+                      {item.title}
+                      {isItemLive && (
+                        <Box
+                          component="span"
+                          sx={{
+                            ml: 1,
+                            px: 1,
+                            py: "2px",
+                            borderRadius: 999,
+                            fontSize: 9,
+                            fontWeight: 900,
+                            bgcolor: "#6CFF8E",
+                            color: "#000",
+                          }}
+                        >
+                          LIVE
+                        </Box>
+                      )}
+                    </Typography>
+                    <Typography sx={{ opacity: 0.65, fontSize: 14 }}>
+                      {item.desc}
+                    </Typography>
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        )}
+      </Box>
+    );
+  })}
 </Box>
 
 
@@ -969,10 +1039,175 @@ are those who can clearly explain their thinking, justify their design choices, 
 that are practical, scalable, and ready to be built in the next phase.`,
       location: "Virtual / Remote",
       mode: "Online",
-      timeline: [
-        { day: "Day 1", title: "Empathy", desc: "Understanding user pain points.", date: "2026-01-04T00:00:00+05:30" },
-        { day: "Day 2", title: "Ideation", desc: "Brainstorming solutions.", date: "2026-01-09T00:00:00+05:30" }
-      ],
+timeline: [
+  /* ───────── REGISTRATION PHASE ───────── */
+  {
+    type: "registration",
+    day: "Registrations Open",
+    title: "Registration Opens",
+    desc: "Participants can start registering for the event.",
+    start: "2026-01-17T00:00:00+05:30",
+    end: "2026-01-28T23:59:59+05:30",
+  },
+  {
+    type: "registration",
+    day: "Registrations Close",
+    title: "Registration Ends",
+    desc: "Last day to register for BuildX Design.",
+    start: "2026-01-28T00:00:00+05:30",
+    end: "2026-01-28T23:59:59+05:30",
+  },
+
+  /* ───────── EVENT DAY START ───────── */
+  {
+    type: "milestone",
+    day: "Event Day",
+    title: "BuildX Design Begins",
+    desc: "Opening of the Design Phase.",
+    start: "2026-02-01T09:30:00+05:30",
+    end: "2026-02-01T09:30:00+05:30",
+  },
+
+  /* ───────── DAY 1 SCHEDULE ───────── */
+  {
+    type: "session",
+    day: "09:30 – 10:00",
+    title: "Opening & Orientation",
+    desc: "Welcome session, rules briefing, and event orientation.",
+    start: "2026-02-01T09:30:00+05:30",
+    end: "2026-02-01T10:00:00+05:30",
+  },
+  {
+    type: "session",
+    day: "10:00",
+    title: "Problem Statement Reveal",
+    desc: "Official problem statements are revealed.",
+    start: "2026-02-01T10:00:00+05:30",
+    end: "2026-02-01T10:00:00+05:30",
+  },
+  {
+    type: "session",
+    day: "10:00 – 10:30",
+    title: "PS Brief & Doubt Clarification",
+    desc: "Detailed explanation of the problem statements and Q&A.",
+    start: "2026-02-01T10:00:00+05:30",
+    end: "2026-02-01T10:30:00+05:30",
+  },
+  {
+    type: "work",
+    day: "10:30 – 13:30",
+    title: "Phase 1 – Designing",
+    desc: "Initial design phase focusing on ideation and structure.",
+    start: "2026-02-01T10:30:00+05:30",
+    end: "2026-02-01T13:30:00+05:30",
+  },
+  {
+    type: "break",
+    day: "13:30 – 14:30",
+    title: "Lunch Break",
+    desc: "Break for lunch and rest.",
+    start: "2026-02-01T13:30:00+05:30",
+    end: "2026-02-01T14:30:00+05:30",
+  },
+  {
+    type: "work",
+    day: "14:30 – 17:00",
+    title: "Designing Continues",
+    desc: "Extended design and refinement session.",
+    start: "2026-02-01T14:30:00+05:30",
+    end: "2026-02-01T17:00:00+05:30",
+  },
+  {
+    type: "break",
+    day: "17:00 – 17:30",
+    title: "Snacks Break",
+    desc: "Short refreshment break.",
+    start: "2026-02-01T17:00:00+05:30",
+    end: "2026-02-01T17:30:00+05:30",
+  },
+  {
+    type: "work",
+    day: "17:30 – 19:00",
+    title: "Designing Session",
+    desc: "Final iterations before presentations.",
+    start: "2026-02-01T17:30:00+05:30",
+    end: "2026-02-01T19:00:00+05:30",
+  },
+  {
+    type: "presentation",
+    day: "19:00 – 20:30",
+    title: "Presentations",
+    desc: "Teams present their designs to mentors and jury.",
+    start: "2026-02-01T19:00:00+05:30",
+    end: "2026-02-01T20:30:00+05:30",
+  },
+  {
+    type: "break",
+    day: "20:30 – 21:30",
+    title: "Dinner Break",
+    desc: "Dinner and relaxation break.",
+    start: "2026-02-01T20:30:00+05:30",
+    end: "2026-02-01T21:30:00+05:30",
+  },
+  {
+    type: "activity",
+    day: "21:30 – 00:00",
+    title: "Quiz Round",
+    desc: "Engaging quiz session for participants.",
+    start: "2026-02-01T21:30:00+05:30",
+    end: "2026-02-02T00:00:00+05:30",
+  },
+
+  /* ───────── DAY 2 ───────── */
+  {
+    type: "work",
+    day: "00:00 – 06:00",
+    title: "Phase 2 – Designing",
+    desc: "Overnight design phase for final improvements.",
+    start: "2026-02-02T00:00:00+05:30",
+    end: "2026-02-02T06:00:00+05:30",
+  },
+  {
+    type: "break",
+    day: "06:00 – 06:30",
+    title: "Morning Tea Break",
+    desc: "Refreshment break.",
+    start: "2026-02-02T06:00:00+05:30",
+    end: "2026-02-02T06:30:00+05:30",
+  },
+  {
+    type: "work",
+    day: "06:30 – 08:15",
+    title: "Final Designing & Submission Reminder",
+    desc: "Final changes and submission preparation.",
+    start: "2026-02-02T06:30:00+05:30",
+    end: "2026-02-02T08:15:00+05:30",
+  },
+  {
+    type: "milestone",
+    day: "08:15",
+    title: "Final Submission Closes",
+    desc: "Design submissions are closed.",
+    start: "2026-02-02T08:15:00+05:30",
+    end: "2026-02-02T08:15:00+05:30",
+  },
+  {
+    type: "presentation",
+    day: "08:30 – 10:00",
+    title: "Final Design Presentation",
+    desc: "Final presentations and evaluation.",
+    start: "2026-02-02T08:30:00+05:30",
+    end: "2026-02-02T10:00:00+05:30",
+  },
+  {
+    type: "milestone",
+    day: "10:00",
+    title: "Event Ends & Pack-up",
+    desc: "Official closing of BuildX Design. Teams wrap up and depart.",
+    start: "2026-02-02T10:00:00+05:30",
+    end: "2026-02-02T10:00:00+05:30",
+  },
+],
       mentors: [{ name: "Alex Rivera", role: "UX Director" }],
       jury: [{ name: "Sarah Chen", role: "Product Lead" }],
       faq: [
