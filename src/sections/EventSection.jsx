@@ -667,7 +667,7 @@ const groupedTimeline = useMemo(() => {
             borderRadius: 2,
             backdropFilter: "blur(20px)",
             color: "#000000",
-            bgcolor: "rgba(203, 203, 203, 1)",
+            bgcolor: "#efefefff",
             border: "1px solid rgba(255,255,255,0.14)",
             boxShadow: "0 12px 40px rgba(255, 255, 255, 0.27)",
             cursor: isDayPast ? "pointer" : "default",

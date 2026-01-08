@@ -7,7 +7,6 @@ import bg4 from "../assets/intro-wallps/intro-wallp-1.png";
 export const introScreens = [
   {
     id: 0,
-    bgImage: bg0,
     type: "hero",
     button: "Get Started",
     logoVariant: "hero",
@@ -15,8 +14,6 @@ export const introScreens = [
   },
   {
     id: 1,
-    bgImage: bg1,
-    darkText: true,
     logoVariant: "nav",
     centerContent: false, 
     centerButton: false,
@@ -26,7 +23,6 @@ export const introScreens = [
   },
 {
   id: 2,
-  bgImage: bg2,
   logoVariant: "nav",
   centerContent: false,
   centerButton: false,
@@ -36,7 +32,6 @@ export const introScreens = [
 },
 {
   id: 3,
-  bgImage: bg3,
   logoVariant: "nav",
   centerContent: false,
   centerButton: false,
@@ -46,7 +41,6 @@ export const introScreens = [
 },
 {
   id: 4,
-  bgImage: bg4,
   type: "hero",
   logoVariant: "hero",
   centerContent: true,

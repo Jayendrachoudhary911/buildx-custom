@@ -28,7 +28,7 @@ export default function AppBackground({ children }) {
           inset: 0,
           background:
             "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.4))",
-          backdropFilter: "saturate(1.9) brightness(1.95) blur(30px)",
+          backdropFilter: "saturate(1.9) brightness(2) blur(80px)",
           zIndex: 0,
         },
 

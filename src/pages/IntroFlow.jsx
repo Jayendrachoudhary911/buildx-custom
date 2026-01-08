@@ -78,7 +78,8 @@ export default function IntroFlow({ onComplete }) {
           inset: 0,
           zIndex: 2000,
           overflow: "hidden",
-          backgroundColor: "#000",
+          backgroundColor: "#00000000",
+          backdropFilter: "blur(130px) brightness(1.35)"
         }}
       >
         {/* 🌄 BACKGROUND */}
@@ -113,7 +114,7 @@ export default function IntroFlow({ onComplete }) {
             initial={{ opacity: 0, y: -40, scale: 0.92, filter: "blur(12px)" }}
             animate={{
               opacity: 1,
-              y: screen.type === "hero" ? 160 : 0,
+              y: screen.type === "hero" ? 130 : 0,
               scale: 1,
               filter: "blur(0px)",
             }}
@@ -160,7 +161,7 @@ export default function IntroFlow({ onComplete }) {
             initial={{ opacity: 0, y: 60, scale: 0.95 }}
             animate={{
               opacity: 1,
-              y: screen.type === "hero" ? -160 : 0,
+              y: screen.type === "hero" ? -130 : 0,
               scale: 1,
             }}
             transition={{ delay: 0.9, duration: 1.3, ease: SOFT_EASE }}

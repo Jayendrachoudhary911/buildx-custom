@@ -5,11 +5,14 @@ import {
   Layers,
   Sliders,
   CheckCircle,
-  Check
+  Check,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+
+// ✅ IMPORT GLOBAL BACKGROUND
+import AppBackground from "../components/AppBackground"; // adjust path if needed
 
 const EASE = [0.25, 0.1, 0.25, 1];
 
@@ -25,11 +28,11 @@ export default function LoadingScreen() {
   const [step, setStep] = useState(0);
   const [exiting, setExiting] = useState(false);
 
-  // Step progression
+  /* ───────── STEP PROGRESSION ───────── */
   useEffect(() => {
     if (step === STEPS.length) {
-      setTimeout(() => setExiting(true), 500);
-      return;
+      const t = setTimeout(() => setExiting(true), 500);
+      return () => clearTimeout(t);
     }
 
     const timer = setTimeout(() => {
@@ -39,116 +42,118 @@ export default function LoadingScreen() {
     return () => clearTimeout(timer);
   }, [step]);
 
-  // Navigate AFTER fade-out
+  /* ───────── NAVIGATE AFTER FADE ───────── */
   useEffect(() => {
     if (!exiting) return;
-    const t = setTimeout(() => 700);
+    const t = setTimeout(() => navigate("/"), 700);
     return () => clearTimeout(t);
   }, [exiting, navigate]);
 
   return (
-    <AnimatePresence>
-      {!exiting && (
-        <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.7, ease: EASE }}
-          style={{ minHeight: "100vh" }}
-        >
-          <Box
-            sx={{
+    <AppBackground>
+      <AnimatePresence>
+        {!exiting && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7, ease: EASE }}
+            style={{
               minHeight: "100vh",
-              display: "grid",
-              placeItems: "center",
-              bgcolor: "transparent",
+              position: "relative",
             }}
           >
-            {/* STEP STACK — NO HIDING */}
-            <Box width={360}>
-              <motion.div
-                animate={{ y: -step * 36 }} // subtle movement, not scroll-off
-                transition={{
-                  type: "spring",
-                  stiffness: 120,
-                  damping: 20,
-                  mass: 0.9,
-                }}
-              >
-                {STEPS.map((s, i) => {
-                  const Icon = s.icon;
-                  const isActive = i === step;
-                  const isPast = i < step;
+            <Box
+              sx={{
+                minHeight: "100vh",
+                display: "grid",
+                placeItems: "center",
+                position: "relative",
+                zIndex: 2, // ✅ keeps content above background layers
+              }}
+            >
+              {/* STEP STACK */}
+              <Box width={360}>
+                <motion.div
+                  animate={{ y: -step * 36 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 120,
+                    damping: 20,
+                    mass: 0.9,
+                  }}
+                >
+                  {STEPS.map((s, i) => {
+                    const Icon = s.icon;
+                    const isActive = i === step;
+                    const isPast = i < step;
 
-                  return (
-                    <motion.div
-                      key={s.label}
-                      animate={{
-                        opacity: isActive ? 1 : isPast ? 0.75 : 0.6,
-                        scale: isActive ? 1 : 0.96,
-                        filter: isActive ? "blur(0px)" : "blur(3px)",
-                      }}
-                      transition={{
-                        duration: 0.6,
-                        ease: EASE,
-                      }}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 16,
-                        marginBottom: 18,
-                      }}
-                    >
-                      {/* ICON */}
-<Box
-  sx={{
-    width: 38,
-    height: 38,
-    borderRadius: "50%",
-    display: "grid",
-    placeItems: "center",
-    bgcolor: isActive
-      ? "rgba(255,255,255,0.18)"
-      : "rgba(255,255,255,0.08)",
-    backdropFilter: "blur(10px)",
-  }}
->
-  {isPast ? (
-    <motion.div
-      initial={{ scale: 0.6, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{
-        duration: 0.35,
-        ease: EASE,
-      }}
-    >
-      <Check size={18} />
-    </motion.div>
-  ) : (
-    <Icon size={18} />
-  )}
-</Box>
-
-
-                      {/* LABEL */}
-                      <Typography
-                        sx={{
-                          fontSize: 15,
-                          fontWeight: isActive ? 600 : 400,
-                          color: isActive
-                            ? "text.primary"
-                            : "text.secondary",
+                    return (
+                      <motion.div
+                        key={s.label}
+                        animate={{
+                          opacity: isActive ? 1 : isPast ? 0.75 : 0.6,
+                          scale: isActive ? 1 : 0.96,
+                          filter: isActive ? "blur(0px)" : "blur(3px)",
+                        }}
+                        transition={{ duration: 0.6, ease: EASE }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: { xs: "center", lg: "left" },
+                          gap: 16,
+                          marginBottom: 18,
                         }}
                       >
-                        {s.label}
-                      </Typography>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
+                        {/* ICON */}
+                        <Box
+                          sx={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: "50%",
+                            display: "grid",
+                            placeItems: "center",
+                            bgcolor: isActive
+                              ? "rgba(255,255,255,0.18)"
+                              : "rgba(255,255,255,0.08)",
+                            backdropFilter: "blur(12px)",
+                            WebkitBackdropFilter: "blur(12px)",
+                            border: "1px solid rgba(255,255,255,0.15)",
+                          }}
+                        >
+                          {isPast ? (
+                            <motion.div
+                              initial={{ scale: 0.6, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ duration: 0.35, ease: EASE }}
+                            >
+                              <Check size={18} />
+                            </motion.div>
+                          ) : (
+                            <Icon size={18} />
+                          )}
+                        </Box>
+
+                        {/* LABEL */}
+                        <Typography
+                          sx={{
+                            fontSize: 15,
+                            fontWeight: isActive ? 600 : 400,
+                            color: isActive
+                              ? "text.primary"
+                              : "text.secondary",
+                          }}
+                        >
+                          {s.label}
+                        </Typography>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              </Box>
             </Box>
-          </Box>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </AppBackground>
   );
 }
