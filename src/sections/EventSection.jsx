@@ -113,11 +113,35 @@ const TimeLeft = memo(({ target }) => {
 const EventCard = memo(function EventCard({ event, onViewMore }) {
   const cardRef = useRef(null);
   const frame = useRef(null);
-  const registrationsOpen = new Date() < event.registrationClosesAt;
 
+  const now = new Date();
+
+  // ───────── REGISTRATION WINDOW LOGIC ─────────
+  const registrationOpensAt =
+    event.registrationOpensAt ?? event.registrationOpensAt;
+
+  const registrationClosesAt = event.registrationClosesAt;
+
+  let registrationStatus = "OPEN";
+  let statusLabel = "REGISTRATIONS OPEN";
+  let statusColor = "#6CFF8E";
+
+  if (now < registrationOpensAt) {
+    registrationStatus = "UPCOMING";
+    statusLabel = `REGISTRATION OPENS ON ${registrationOpensAt.toLocaleDateString(
+      "en-US",
+      { day: "2-digit", month: "short" }
+    )}`;
+    statusColor = "#FFD36C";
+  } else if (now > registrationClosesAt) {
+    registrationStatus = "CLOSED";
+    statusLabel = "REGISTRATIONS CLOSED";
+    statusColor = "#FF7A7A";
+  }
+
+  // ───────── MOUSE PARALLAX ─────────
   const handleMouseMove = useCallback((e) => {
     if (!cardRef.current) return;
-
     if (frame.current) cancelAnimationFrame(frame.current);
 
     frame.current = requestAnimationFrame(() => {
@@ -137,257 +161,159 @@ const EventCard = memo(function EventCard({ event, onViewMore }) {
   }, []);
 
   return (
-<Box
-  ref={cardRef}
-  onMouseMove={handleMouseMove}
-  onMouseLeave={resetTilt}
-  onClick={() => onViewMore(event)}
-  sx={{
-    position: "relative",
-    height: { xs: 480, md: 560 },
-    width: { xs: "80vw", md: 380 },
-    borderRadius: 3,
-    mx: 0,
-    mb: 3,
-    cursor: "pointer",
-    backgroundColor: "transparent",
-    transform:
-      "perspective(1000px) rotateX(calc(var(--y) * -8deg)) rotateY(calc(var(--x) * 8deg))",
-    transition: "transform 0.2s ease-out, box-shadow 0.4s ease",
-    willChange: "transform",
-
-    "&:hover": {
-      boxShadow: "0 40px 100px rgba(0,0,0,0.7)",
-
-      "& .event-bg": {
-        transform:
-          "scale(1.12) translate(calc(var(--x) * -15px), calc(var(--y) * -15px))",
-      },
-
-      /* 🔥 ONLY TITLE + VIEW MORE ON HOVER */
-      "& .title, & .viewMore": {
-        opacity: 1,
-        transform: "translateY(0)",
-      },
-    },
-
-    /* 📱 Mobile / no-hover fallback */
-    "@media (hover: none)": {
-      "& .title, & .viewMore": {
-        opacity: 1,
-        transform: "none",
-      },
-    },
-  }}
->
-
-
-<Box
-  className="event-bg"
-  sx={{
-    position: "absolute",
-    inset: -20,
-    backgroundImage: `url(${event.image})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    borderRadius: 3,
-    transition: "transform 0.15s ease-out",
-    overflow: "hidden",
-    opacity: 0.8,
-
-    /* Base dark fade */
-    "&::after": {
-      content: '""',
-      position: "absolute",
-      inset: 0,
-      background:
-        "linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0,0,0,0) 35%, transparent 70%)",
-      zIndex: 1,
-    },
-
-    /* Progressive blur layer */
-    "&::before": {
-      content: '""',
-      position: "absolute",
-      inset: 0,
-      backdropFilter: { xs: "blur(20px)", lg: "blur(0px)" },
-      WebkitBackdropFilter: { xs: "blur(20px)", lg: "blur(0px)" },
-
-      zIndex: 2,
-      pointerEvents: "none",
-    },
-  }}
-/>
-
-
-<Box
-  className="content"
-  sx={{
-    position: "absolute",
-    bottom: { xs: 0, lg: -60 },
-    zIndex: 2,
-    p: { xs: 1, lg: 3.2 },
-    color: "#fff",
-    width: "100%",
-  }}
->
-
-    {/* TITLE */}
-<Typography
-  className="title"
-  fontSize={32}
-  fontWeight={600}
-  letterSpacing="-0.01em"
-  mb={0.6}
-  sx={{
-    opacity: 0,
-    transform: "translateY(12px)",
-    transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
-  }}
->
-  {event.title}
-</Typography>
-
-    {/* STATUS */}
-<Box
-  className="meta"
-  sx={{
-    display: "flex",
-    gap: 1.5,
-    mb: 1.5,
-
-    /* ✅ ALWAYS VISIBLE */
-    opacity: 0.85,
-    transform: "none",
-
-    fontVariantNumeric: "tabular-nums",
-    "& span": {
-      display: "inline-flex",
-      alignItems: "baseline",
-      gap: "2px",
-      fontSize: 13,
-      fontWeight: 600,
-    },
-    "& b": {
-      fontSize: 10,
-      fontWeight: 700,
-      opacity: 0.5,
-      textTransform: "uppercase",
-    },
-  }}
->
-
-  <TimeLeft target={event.startDate} />
-</Box>
-
-<Typography
-  fontSize={11}
-  fontWeight={700}
-  mb={1}
-  sx={{
-    color: registrationsOpen ? "#6CFF8E" : "#FF7A7A",
-    letterSpacing: "0.12em",
-    opacity: 0.85,
-  }}
->
-  {registrationsOpen ? "REGISTRATIONS OPEN" : "REGISTRATIONS CLOSED"}
-</Typography>
-
-<Typography
-  className="description"
-  fontSize={14}
-  sx={{
-    opacity: 0.85,
-    display: "-webkit-box",
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: "vertical",
-    overflow: "hidden",
-  }}
->
-  {event.short}
-</Typography>
-
-
-    {/* ───────── VIEW MORE CTA ───────── */}
     <Box
-      className="viewMore"
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={resetTilt}
+      onClick={() => onViewMore(event)}
       sx={{
-    mt: 3,
-    display: "flex",
-    justifyContent: "center",
-    gap: 2,
-
-    opacity: 0,
-    transform: "translateY(12px)",
-    transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
+        position: "relative",
+        height: { xs: 480, md: 560 },
+        width: { xs: "80vw", md: 380 },
+        borderRadius: 3,
+        cursor: "pointer",
+        transform:
+          "perspective(1000px) rotateX(calc(var(--y) * -8deg)) rotateY(calc(var(--x) * 8deg))",
+        transition: "transform 0.2s ease-out, box-shadow 0.4s ease",
+        "&:hover": {
+          boxShadow: "0 40px 100px rgba(0,0,0,0.7)",
+          "& .event-bg": {
+            transform:
+              "scale(1.12) translate(calc(var(--x) * -15px), calc(var(--y) * -15px))",
+          },
+          "& .title, & .viewMore": {
+            opacity: 1,
+            transform: "translateY(0)",
+          },
+        },
       }}
     >
-      <Button
-        fullWidth
-        onClick={(e) => {
-          e.stopPropagation();
-          onViewMore(event);
-        }}
+      {/* ───────── BACKGROUND ───────── */}
+      <Box
+        className="event-bg"
         sx={{
-          px: 4.5,
-          py: 1.3,
-          borderRadius: 999,
-          fontWeight: 600,
-          textTransform: "none",
+          position: "absolute",
+          inset: -20,
+          backgroundImage: `url(${event.image})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          borderRadius: 3,
+          transition: "transform 0.15s ease-out",
+          opacity: 0.85,
+        }}
+      />
 
+      {/* ───────── CONTENT ───────── */}
+      <Box
+        className="content"
+        sx={{
+          position: "absolute",
+          bottom: { xs: 0, lg: -60 },
+          zIndex: 2,
+          p: { xs: 1.5, lg: 3.2 },
           color: "#fff",
-          background: "rgba(255, 255, 255, 0)",
-          border: "1.5px solid rgba(255,255,255,0.3)",
-          backdropFilter: "blur(14px)",
-
-          boxShadow: "none",
-          transition: "all 0.25s ease",
-
-          "&:hover": {
-            background: "#fff",
-            color: "#000",
-            transform: "scale(1.05)",
-          },
+          width: "100%",
         }}
       >
-        View More
-      </Button>
+        {/* TITLE */}
+        <Typography
+          className="title"
+          fontSize={32}
+          fontWeight={600}
+          mb={0.6}
+          sx={{
+            opacity: 0,
+            transform: "translateY(12px)",
+            transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
+          }}
+        >
+          {event.title}
+        </Typography>
 
-      <Button
-        fullWidth
-        onClick={(e) => {
-          e.stopPropagation();
-          onViewMore(event);
-        }}
-        sx={{
-          px: 4.5,
-          py: 1.3,
-          borderRadius: 999,
-          fontWeight: 600,
-          textTransform: "none",
+        {/* COUNTDOWN (TO EVENT START) */}
+        <Box mb={1.2}>
+          <TimeLeft target={event.startDate} />
+        </Box>
 
-          color: "#000000ff",
-          background: "rgba(255, 255, 255, 1)",
-          backdropFilter: "blur(14px)",
+        {/* ───────── REGISTRATION STATUS ───────── */}
+        <Typography
+          fontSize={11}
+          fontWeight={800}
+          mb={1}
+          sx={{
+            color: statusColor,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+          }}
+        >
+          {statusLabel}
+        </Typography>
 
-          boxShadow: "none",
-          transition: "all 0.25s ease",
+        {/* DESCRIPTION */}
+        <Typography
+          fontSize={14}
+          sx={{
+            opacity: 0.85,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {event.short}
+        </Typography>
 
-          "&:hover": {
-            background: "#000000ff",
-            color: "#ffffffff",
-            transform: "scale(1.05)",
-          },
-        }}
-      >
-        Register
-      </Button>
-    </Box>
+        {/* ───────── CTA ───────── */}
+        <Box
+          className="viewMore"
+          sx={{
+            mt: 3,
+            display: "flex",
+            gap: 2,
+            opacity: 0,
+            transform: "translateY(12px)",
+            transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
+          }}
+        >
+          <Button
+            fullWidth
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewMore(event);
+            }}
+            sx={{
+              py: 1.3,
+              borderRadius: 999,
+              fontWeight: 600,
+              textTransform: "none",
+              border: "1.5px solid rgba(255,255,255,0.3)",
+              backdropFilter: "blur(14px)",
+              color: "#fff",
+            }}
+          >
+            View More
+          </Button>
 
-  </Box>
+          {registrationStatus === "OPEN" && (
+            <Button
+              fullWidth
+              sx={{
+                py: 1.3,
+                borderRadius: 999,
+                fontWeight: 600,
+                bgcolor: "#fff",
+                color: "#000",
+              }}
+            >
+              Register
+            </Button>
+          )}
+        </Box>
+      </Box>
     </Box>
   );
 });
+
 
 const IconLabel = ({ icon: Icon, label, value }) => (
   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
@@ -1020,8 +946,9 @@ const events = useMemo(() => [
       id: "buildx-design",
       title: "BuildX Design",
       phase: "DESIGN",
-      startDate: new Date("2026-01-10T10:00:00+05:30"),
-      registrationClosesAt: new Date("2026-01-08T23:59:00+05:30"),
+      startDate: new Date("2026-02-01T10:00:00+05:30"),
+      registrationOpensAt: new Date("2026-01-17T23:59:00+05:30"),
+      registrationClosesAt: new Date("2026-01-28T23:59:00+05:30"),
       image: "/assets/event-posters/design.png",
       short: `Understand real problems before writing code.
 Explore user needs, constraints, and real-world context.
@@ -1259,7 +1186,8 @@ timeline: [
       title: "BuildX Dev",
       phase: "DEV",
       startDate: new Date("2026-01-17T10:00:00+05:30"),
-      registrationClosesAt: new Date("2026-01-15T23:59:00+05:30"),
+      registrationOpensAt: new Date("2026-02-02T23:59:00+05:30"),
+      registrationClosesAt: new Date("2026-02-16T23:59:00+05:30"),
       image: "/assets/event-posters/dev.png",
       short: `Turn designs into real, working products.
 Build features under real-world time and technical constraints.
