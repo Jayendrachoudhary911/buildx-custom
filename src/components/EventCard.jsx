@@ -10,8 +10,9 @@ export default function EventCard({ event }) {
     <Box
       sx={{
         position: "relative",
-        height: { xs: 340, sm: 360, md: 380 },
+        height: { xs: 1440, sm: 360, md: 380 },
         borderRadius: 4,
+        mb: 5,    
         overflow: "hidden",
         // Keep the image as the card background
         backgroundImage: `url(${event.image})`,

@@ -351,6 +351,52 @@ useEffect(() => {
   }
 }, []);
 
+const getStageBounds = (items) => {
+  const starts = items.map(i => new Date(i.start).getTime());
+  const ends = items.map(i => new Date(i.end).getTime());
+  return {
+    start: new Date(Math.min(...starts)),
+    end: new Date(Math.max(...ends)),
+  };
+};
+
+const getGroupBounds = (items) => {
+  const starts = items.map(i => new Date(i.start).getTime());
+  const ends = items.map(i => new Date(i.end).getTime());
+
+  return {
+    start: new Date(Math.min(...starts)),
+    end: new Date(Math.max(...ends)),
+  };
+};
+
+const getGroupStatus = (start, end) => {
+  const now = Date.now();
+  if (now < start.getTime()) return "UPCOMING";
+  if (now > end.getTime()) return "COMPLETED";
+  return "LIVE";
+};
+
+const STATUS_STYLES = {
+  LIVE: {
+    label: "LIVE",
+    bgcolor: "#6CFF8E",
+    color: "#000",
+    pulse: true,
+  },
+  UPCOMING: {
+    label: "UPCOMING",
+    bgcolor: "#E3F2FD",
+    color: "#1565C0",
+  },
+  COMPLETED: {
+    label: "COMPLETED",
+    bgcolor: "#EEEEEE",
+    color: "#616161",
+  },
+};
+
+
 
 const groupedTimeline = useMemo(() => {
     if (!event?.timeline) return [];
@@ -537,233 +583,287 @@ const groupedTimeline = useMemo(() => {
       </Button>
     </Box>
 
-      {/* TIMELINE */}
-      <Typography sx={{ fontWeight: 800, mb: 5, fontSize: "1.6rem" }}>
-        The Road Ahead
+{/* ───────── EVENT TIMELINE ───────── */}
+
+<Box sx={{ mt: { xs: 10, md: 14 }, mb: { xs: 8, md: 12 } }}>
+
+  {/* SECTION TITLE */}
+  <Typography
+    sx={{
+      fontWeight: 900,
+      fontSize: { xs: "1.8rem", md: "2.4rem" },
+      mb: 4,
+    }}
+  >
+    Event Timeline
+  </Typography>
+
+  {/* GRID CONTAINER */}
+  <Box
+    sx={{
+      display: "grid",
+      gridTemplateColumns: {
+        xs: "1fr",
+        sm: "repeat(2, 1fr)",
+        md: "repeat(2, 1fr)",
+      },
+      gap: 2,
+      maxWidth: 700,
+    }}
+  >
+
+    {/* REGISTRATION OPENS */}
+    <Box
+      sx={{
+        p: 3.5,
+        borderRadius: 2,
+        bgcolor: "rgba(255, 255, 255, 0.12)",
+        border: "1px solid rgba(255,255,255,0.1)",
+      }}
+    >
+      <Typography fontWeight={900} mb={1}>
+        Registration Opens
       </Typography>
 
-<Box sx={{ position: "relative", mt: 6 }}>
-  {groupedTimeline.map((group) => {
-    const now = Date.now();
+      <Typography sx={{ fontSize: 15, opacity: 0.85, mb: 1 }}>
+        Jan 18, 2026 | 10:00 AM IST
+      </Typography>
 
-    const isDayLive =
-      now >= group.dayStart.getTime() &&
-      now <= group.dayEnd.getTime();
+      <Typography sx={{ fontSize: 14, opacity: 0.7, lineHeight: 1.6 }}>
+        Participants can start registering on Unstop. Both individual and team
+        registrations are allowed. Once registered, participants will receive
+        payment instructions and further onboarding communication via email.
+      </Typography>
+    </Box>
 
-    const isDayPast = now > group.dayEnd.getTime();
+    {/* REGISTRATION CLOSES */}
+    <Box
+      sx={{
+        p: 3.5,
+        borderRadius: 2,
+        bgcolor: "rgba(255,255,255,0.12)",
+        border: "1px solid rgba(255,255,255,0.1)",
+      }}
+    >
+      <Typography fontWeight={900} mb={1}>
+        Registration Closes
+      </Typography>
 
-    const isCollapsed = isDayPast && !isDayLive && collapsedDays.has(group.dateKey);
+      <Typography sx={{ fontSize: 15, opacity: 0.85, mb: 1 }}>
+        Jan 28, 2026 | 11:59 PM IST
+      </Typography>
 
-    /* DAY PROGRESS */
-    let dayProgress = 0;
-    if (now > group.dayEnd.getTime()) dayProgress = 1;
-    else if (now > group.dayStart.getTime()) {
-      dayProgress =
-        (now - group.dayStart.getTime()) /
-        (group.dayEnd.getTime() - group.dayStart.getTime());
-    }
+      <Typography sx={{ fontSize: 14, opacity: 0.7, lineHeight: 1.6 }}>
+        This is the final deadline to register for the event. No new entries will
+        be accepted after this time. Teams are advised to complete payment and
+        verification early to avoid last-minute issues.
+      </Typography>
+    </Box>
 
-    return (
-      <Box key={group.dateKey} sx={{ mb: 10 }}>
-        {/* ───── DATE HEADER ───── */}
-        <Box
-          ref={isDayLive ? todayHeaderRef : null}
-          onClick={() => {
-            if (!isDayPast) return;
-            setCollapsedDays((prev) => {
-              const next = new Set(prev);
-              next.has(group.dateKey)
-                ? next.delete(group.dateKey)
-                : next.add(group.dateKey);
-              return next;
-            });
-          }}
-          sx={{
-            position: "sticky",
-            top: 12,
-            zIndex: 6,
-            width: 320,
-            mb: 3,
-            px: 1,
-            py: 1,
-            pl: 3,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderRadius: 2,
-            backdropFilter: "blur(20px)",
-            color: "#000000",
-            bgcolor: "#efefefff",
-            border: "1px solid rgba(255,255,255,0.14)",
-            boxShadow: "0 12px 40px rgba(255, 255, 255, 0.27)",
-            cursor: isDayPast ? "pointer" : "default",
-          }}
-        >
-          <Typography
-            sx={{
-              fontWeight: 900,
-              letterSpacing: "0.12em",
-              fontSize: 13,
-              textTransform: "uppercase",
-            }}
-          >
-            {group.dateObj.toLocaleDateString("en-US", {
-              weekday: "long",
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}
-          </Typography>
+    {/* EVENT START */}
+    <Box
+      sx={{
+        p: 3.5,
+        borderRadius: 2,
+        bgcolor: "rgba(108,255,142,0.12)",
+        border: "1px solid rgba(108,255,142,0.35)",
+      }}
+    >
+      <Typography fontWeight={900} mb={1}>
+        Event Starts
+      </Typography>
 
-          {isDayLive ? (
-            <Box
-              sx={{
-                px: 2,
-                py: 0.6,
-                borderRadius: 999,
-                fontSize: 10,
-                fontWeight: 900,
-                bgcolor: "#6CFF8E",
-                color: "#000",
-                animation: "pulse 1.6s infinite",
-                "@keyframes pulse": {
-                  "0%": { boxShadow: "0 0 0 0 rgba(108,255,142,0.6)" },
-                  "70%": { boxShadow: "0 0 0 14px rgba(108,255,142,0)" },
-                  "100%": { boxShadow: "0 0 0 0 rgba(108,255,142,0)" },
-                },
-              }}
-            >
-              LIVE NOW
-            </Box>
-          ) : isDayPast ? (
-            <Typography sx={{ opacity: 0.6, fontSize: 12 }}>
-              Completed · {isCollapsed ? "Expand" : "Collapse"}
-            </Typography>
-          ) : null}
-        </Box>
+      <Typography sx={{ fontSize: 15, opacity: 0.9, mb: 1 }}>
+        Sunday, Feb 1, 2026 | 9:30 AM IST
+      </Typography>
 
-          {/* Verticle Line */}
-            <Box
-              sx={{
-                position: "absolute",
-                left: 78,   
-                top: 0,
-                bottom: 0,
-                width: 6,
-                bgcolor: "rgba(255, 255, 255, 0.06)",
-              }}
-            />
+      <Typography sx={{ fontSize: 14, opacity: 0.75, lineHeight: 1.6 }}>
+        The official kickoff session begins. Participants will receive event
+        guidelines, judging criteria, problem statements, and access to official
+        communication channels. Design activities start immediately after the
+        opening ceremony.
+      </Typography>
+    </Box>
 
-        {/* ───── DAY PROGRESS ───── */}
-        {/* {!isCollapsed && (
-          <Box
-            sx={{
-                position: "absolute",
-                left: 78,   
-                top: 0,
-                bottom: 0,
-              width: 6,
-              borderRadius: 999,
-              mb: 6,
-              background: "rgba(255,255,255,0.12)",
-              overflow: "hidden",
-            }}
-          >
-            <Box
-              sx={{
-                height: "100%",
-                width: `${dayProgress * 100}%`,
-                background:
-                  "linear-gradient(90deg,#6CFF8E,#ffffff)",
-                transition: "width 1s cubic-bezier(.16,1,.3,1)",
-              }}
-            />
-          </Box>
-        )} */}
+    {/* EVENT END */}
+    <Box
+      sx={{
+        p: 3.5,
+        borderRadius: 2,
+        bgcolor: "rgba(255,183,77,0.12)",
+        border: "1px solid rgba(255,183,77,0.35)",
+      }}
+    >
+      <Typography fontWeight={900} mb={1}>
+        Event Ends
+      </Typography>
 
-        {/* ───── TIMELINE BODY ───── */}
-        {!isCollapsed && (
-          <Box sx={{ position: "relative", pl: 6 }}>
-            {group.items.map((item, i) => {
-              const isItemLive =
-                now >= item.startObj.getTime() &&
-                now <= item.endObj.getTime();
+      <Typography sx={{ fontSize: 15, opacity: 0.9, mb: 1 }}>
+        Monday, Feb 2, 2026 | 10:00 AM IST
+      </Typography>
 
-              return (
-                <Box
-                  key={i}
-                  ref={isItemLive ? liveItemRef : null}
-                  sx={{
-                    display: "flex",
-                    gap: 4,
-                    mb: 6,
-                    position: "relative",
-                    opacity: now > item.endObj.getTime() ? 0.45 : 1,
-                  }}
-                >
-                  {/* TIME NODE */}
-                  <Box
-                    sx={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 900,
-                      fontSize: 12,
-                      bgcolor: isItemLive ? "#6CFF8E" : "#fff",
-                      color: "#000",
-                      boxShadow: isItemLive
-                        ? "0 0 0 10px rgba(108,255,142,0.25), 0 0 30px rgba(108,255,142,0.8)"
-                        : "0 0 20px rgba(255,255,255,0.5)",
-                    }}
-                  >
-                    {item.startObj.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </Box>
+      <Typography sx={{ fontSize: 14, opacity: 0.75, lineHeight: 1.6 }}>
+        Final design submissions close at this time. Judges will begin evaluation
+        and shortlisting. Winners and shortlisted teams will be announced shortly
+        after the review process is completed.
+      </Typography>
+    </Box>
 
-                  {/* CONTENT */}
-                  <Box sx={{ pt: 0.5 }}>
-                    <Typography sx={{ fontWeight: 800, fontSize: 17 }}>
-                      {item.title}
-                      {isItemLive && (
-                        <Box
-                          component="span"
-                          sx={{
-                            ml: 1,
-                            px: 1,
-                            py: "2px",
-                            borderRadius: 999,
-                            fontSize: 9,
-                            fontWeight: 900,
-                            bgcolor: "#6CFF8E",
-                            color: "#000",
-                          }}
-                        >
-                          LIVE
-                        </Box>
-                      )}
-                    </Typography>
-                    <Typography sx={{ opacity: 0.65, fontSize: 14 }}>
-                      {item.desc}
-                    </Typography>
-                  </Box>
-                </Box>
-              );
-            })}
-          </Box>
-        )}
-      </Box>
-    );
-  })}
+  </Box>
 </Box>
 
 
+{/* ───────── WHAT YOU WILL GET ───────── */}
+
+<Box sx={{ mb: { xs: 10, md: 16 }, mt: 3 }}>
+
+      <Typography
+        sx={{
+          fontSize: "1.6rem",
+          fontWeight: 900,
+          lineHeight: 1.1,
+          mb: 2,
+          color: "#ffffff",
+        }}
+      >
+        What You Will Get
+      </Typography>
+
+      <Typography
+        sx={{
+          opacity: 0.7,
+          fontSize: 16,
+        }}
+      >
+        Unlock exciting rewards, recognition, and exclusive benefits by
+        participating in BuildX.
+      </Typography>
+
+
+  {/* COMMON GRID CONTAINER */}
+  <Box
+    sx={{
+      display: "grid",
+      gridTemplateColumns: {
+        xs: "1fr",
+        sm: "repeat(2, 1fr)",
+        md: "repeat(2, 1fr)",
+      },
+      maxWidth: 700,
+      gap: 2,
+      mt: 3
+    }}
+  >
+
+    {/* Prize Pool */}
+    <Box
+      sx={{
+        p: 4,
+        borderRadius: 2,
+        bgcolor: "#ffffff22",
+        color: "#ffffff",
+        border: "2px solid #f1f1f147"
+      }}
+    >
+      <Typography fontWeight={900} fontSize={22} mb={1}>
+        ₹25K Prize Pool
+      </Typography>
+
+      <Typography sx={{ opacity: 0.75 }}>
+        Compete for a total prize pool of ₹25,000 and earn exciting rewards
+        for outstanding performance.
+      </Typography>
+    </Box>
+
+    {/* Top 3 Designs */}
+    <Box
+      sx={{
+        p: 4,
+        borderRadius: 2,
+        bgcolor: "#ffffff22",
+        color: "#ffffff",
+        border: "2px solid #f1f1f147"
+      }}
+    >
+      <Typography fontWeight={900} fontSize={22} mb={1}>
+        Prizes for Top 3 Designs
+      </Typography>
+
+      <Typography sx={{ opacity: 0.75 }}>
+        Special rewards and recognition will be given to the top three
+        winning design teams.
+      </Typography>
+    </Box>
+
+    {/* Exclusive Swags */}
+    <Box
+      sx={{
+        p: 4,
+        borderRadius: 2,
+        bgcolor: "#ffffff22",
+        color: "#ffffff",
+        border: "2px solid #f1f1f147"
+      }}
+    >
+      <Typography fontWeight={900} fontSize={22} mb={1}>
+        Exclusive Swags
+      </Typography>
+
+      <Typography sx={{ opacity: 0.75 }}>
+        Get your hands on exclusive BuildX merchandise, goodies, and
+        collectibles made specially for participants.
+      </Typography>
+    </Box>
+
+    {/* Certificates */}
+    <Box
+      sx={{
+        p: 4,
+        borderRadius: 2,
+        bgcolor: "#ffffff22",
+        color: "#ffffff",
+        border: "2px solid #f1f1f147"
+      }}
+    >
+      <Typography fontWeight={900} fontSize={22} mb={1}>
+        Certificates
+      </Typography>
+
+      <Typography sx={{ opacity: 0.75 }}>
+        Receive official participation and achievement certificates to
+        strengthen your resume and portfolio.
+      </Typography>
+    </Box>
+
+    {/* Industry Recognition */}
+    <Box
+      sx={{
+        p: 4,
+        borderRadius: 2,
+        bgcolor: "#ffffff22",
+        color: "#ffffff",
+        border: "2px solid #f1f1f147"
+      }}
+    >
+      <Typography fontWeight={900} fontSize={22} mb={1}>
+        Industry Recognition
+      </Typography>
+
+      <Typography sx={{ opacity: 0.75 }}>
+        Get noticed by mentors, judges, and partner organizations during
+        the event showcase.
+      </Typography>
+    </Box>
+
+  </Box>
+
+
+</Box>
+
+
+
       {/* MENTORS */}
-      <Typography sx={{ fontWeight: 800, mt: 10, mb: 5, fontSize: "1.6rem" }}>
+      {/* <Typography sx={{ fontWeight: 800, mt: 10, mb: 5, fontSize: "1.6rem" }}>
         Guided by Experts
       </Typography>
 
@@ -809,7 +909,7 @@ const groupedTimeline = useMemo(() => {
             </Box>
           </Grid>
         ))}
-      </Grid>
+      </Grid> */}
 
 
           {/* ───────── FAQ (LAST) ───────── */}
@@ -947,7 +1047,7 @@ const events = useMemo(() => [
       title: "BuildX Design",
       phase: "DESIGN",
       startDate: new Date("2026-02-01T10:00:00+05:30"),
-      registrationOpensAt: new Date("2026-01-17T23:59:00+05:30"),
+      registrationOpensAt: new Date("2026-01-18T10:00:00+05:30"),
       registrationClosesAt: new Date("2026-01-28T23:59:00+05:30"),
       image: "/assets/event-posters/design.png",
       short: `Understand real problems before writing code.
@@ -967,172 +1067,112 @@ that are practical, scalable, and ready to be built in the next phase.`,
       location: "Virtual / Remote",
       mode: "Online",
 timeline: [
-  /* ───────── REGISTRATION PHASE ───────── */
+  /* ───────── REGISTRATION STAGE ───────── */
   {
-    type: "registration",
-    day: "Registrations Open",
-    title: "Registration Opens",
-    desc: "Participants can start registering for the event.",
-    start: "2026-01-17T00:00:00+05:30",
-    end: "2026-01-28T23:59:59+05:30",
-  },
-  {
-    type: "registration",
-    day: "Registrations Close",
-    title: "Registration Ends",
-    desc: "Last day to register for BuildX Design.",
-    start: "2026-01-28T00:00:00+05:30",
-    end: "2026-01-28T23:59:59+05:30",
-  },
-
-  /* ───────── EVENT DAY START ───────── */
-  {
-    type: "milestone",
-    day: "Event Day",
-    title: "BuildX Design Begins",
-    desc: "Opening of the Design Phase.",
-    start: "2026-02-01T09:30:00+05:30",
-    end: "2026-02-01T09:30:00+05:30",
+    stage: "registration",
+    dateKey: "2026-01-17",
+    dateObj: new Date("2026-01-17T00:00:00+05:30"),
+    rangeLabel: "17 Jan 26 → 28 Jan 26",
+    items: [
+      {
+        title: "Registration Window",
+        desc: "Participants can register for BuildX Design during this period.",
+        timeRange: "17 Jan 26, 12:00 AM IST → 28 Jan 26, 11:59 PM IST",
+        platform: "Online",
+        start: "2026-01-17T00:00:00+05:30",
+        end: "2026-01-28T23:59:59+05:30",
+      },
+    ],
   },
 
-  /* ───────── DAY 1 SCHEDULE ───────── */
+  /* ───────── EVENT DAY 1 ───────── */
   {
-    type: "session",
-    day: "09:30 – 10:00",
-    title: "Opening & Orientation",
-    desc: "Welcome session, rules briefing, and event orientation.",
-    start: "2026-02-01T09:30:00+05:30",
-    end: "2026-02-01T10:00:00+05:30",
-  },
-  {
-    type: "session",
-    day: "10:00",
-    title: "Problem Statement Reveal",
-    desc: "Official problem statements are revealed.",
-    start: "2026-02-01T10:00:00+05:30",
-    end: "2026-02-01T10:00:00+05:30",
-  },
-  {
-    type: "session",
-    day: "10:00 – 10:30",
-    title: "PS Brief & Doubt Clarification",
-    desc: "Detailed explanation of the problem statements and Q&A.",
-    start: "2026-02-01T10:00:00+05:30",
-    end: "2026-02-01T10:30:00+05:30",
-  },
-  {
-    type: "work",
-    day: "10:30 – 13:30",
-    title: "Phase 1 – Designing",
-    desc: "Initial design phase focusing on ideation and structure.",
-    start: "2026-02-01T10:30:00+05:30",
-    end: "2026-02-01T13:30:00+05:30",
-  },
-  {
-    type: "break",
-    day: "13:30 – 14:30",
-    title: "Lunch Break",
-    desc: "Break for lunch and rest.",
-    start: "2026-02-01T13:30:00+05:30",
-    end: "2026-02-01T14:30:00+05:30",
-  },
-  {
-    type: "work",
-    day: "14:30 – 17:00",
-    title: "Designing Continues",
-    desc: "Extended design and refinement session.",
-    start: "2026-02-01T14:30:00+05:30",
-    end: "2026-02-01T17:00:00+05:30",
-  },
-  {
-    type: "break",
-    day: "17:00 – 17:30",
-    title: "Snacks Break",
-    desc: "Short refreshment break.",
-    start: "2026-02-01T17:00:00+05:30",
-    end: "2026-02-01T17:30:00+05:30",
-  },
-  {
-    type: "work",
-    day: "17:30 – 19:00",
-    title: "Designing Session",
-    desc: "Final iterations before presentations.",
-    start: "2026-02-01T17:30:00+05:30",
-    end: "2026-02-01T19:00:00+05:30",
-  },
-  {
-    type: "presentation",
-    day: "19:00 – 20:30",
-    title: "Presentations",
-    desc: "Teams present their designs to mentors and jury.",
-    start: "2026-02-01T19:00:00+05:30",
-    end: "2026-02-01T20:30:00+05:30",
-  },
-  {
-    type: "break",
-    day: "20:30 – 21:30",
-    title: "Dinner Break",
-    desc: "Dinner and relaxation break.",
-    start: "2026-02-01T20:30:00+05:30",
-    end: "2026-02-01T21:30:00+05:30",
-  },
-  {
-    type: "activity",
-    day: "21:30 – 00:00",
-    title: "Quiz Round",
-    desc: "Engaging quiz session for participants.",
-    start: "2026-02-01T21:30:00+05:30",
-    end: "2026-02-02T00:00:00+05:30",
+    stage: "event",
+    dateKey: "2026-02-01",
+    dateObj: new Date("2026-02-01T00:00:00+05:30"),
+    rangeLabel: "01 Feb 26, 09:30 AM → 02 Feb 26, 12:00 AM",
+    items: [
+      {
+        title: "BuildX Design Begins",
+        desc: "Opening of the Design Phase.",
+        timeRange: "09:30 AM IST",
+        start: "2026-02-01T09:30:00+05:30",
+        end: "2026-02-01T09:30:00+05:30",
+      },
+      {
+        title: "Opening & Orientation",
+        desc: "Welcome session, rules briefing, and event orientation.",
+        timeRange: "09:30 AM → 10:00 AM",
+        start: "2026-02-01T09:30:00+05:30",
+        end: "2026-02-01T10:00:00+05:30",
+      },
+      {
+        title: "Problem Statement Reveal",
+        desc: "Official problem statements are revealed.",
+        timeRange: "10:00 AM",
+        start: "2026-02-01T10:00:00+05:30",
+        end: "2026-02-01T10:00:00+05:30",
+      },
+      {
+        title: "Phase 1 – Designing",
+        desc: "Ideation, structure, and early design iterations.",
+        timeRange: "10:30 AM → 07:00 PM",
+        start: "2026-02-01T10:30:00+05:30",
+        end: "2026-02-01T19:00:00+05:30",
+      },
+      {
+        title: "Presentations",
+        desc: "Teams present their designs to mentors and jury.",
+        timeRange: "07:00 PM → 08:30 PM",
+        start: "2026-02-01T19:00:00+05:30",
+        end: "2026-02-01T20:30:00+05:30",
+      },
+      {
+        title: "Quiz Round",
+        desc: "Engaging quiz session for participants.",
+        timeRange: "09:30 PM → 12:00 AM",
+        start: "2026-02-01T21:30:00+05:30",
+        end: "2026-02-02T00:00:00+05:30",
+      },
+    ],
   },
 
-  /* ───────── DAY 2 ───────── */
+  /* ───────── EVENT DAY 2 ───────── */
   {
-    type: "work",
-    day: "00:00 – 06:00",
-    title: "Phase 2 – Designing",
-    desc: "Overnight design phase for final improvements.",
-    start: "2026-02-02T00:00:00+05:30",
-    end: "2026-02-02T06:00:00+05:30",
-  },
-  {
-    type: "break",
-    day: "06:00 – 06:30",
-    title: "Morning Tea Break",
-    desc: "Refreshment break.",
-    start: "2026-02-02T06:00:00+05:30",
-    end: "2026-02-02T06:30:00+05:30",
-  },
-  {
-    type: "work",
-    day: "06:30 – 08:15",
-    title: "Final Designing & Submission Reminder",
-    desc: "Final changes and submission preparation.",
-    start: "2026-02-02T06:30:00+05:30",
-    end: "2026-02-02T08:15:00+05:30",
-  },
-  {
-    type: "milestone",
-    day: "08:15",
-    title: "Final Submission Closes",
-    desc: "Design submissions are closed.",
-    start: "2026-02-02T08:15:00+05:30",
-    end: "2026-02-02T08:15:00+05:30",
-  },
-  {
-    type: "presentation",
-    day: "08:30 – 10:00",
-    title: "Final Design Presentation",
-    desc: "Final presentations and evaluation.",
-    start: "2026-02-02T08:30:00+05:30",
-    end: "2026-02-02T10:00:00+05:30",
-  },
-  {
-    type: "milestone",
-    day: "10:00",
-    title: "Event Ends & Pack-up",
-    desc: "Official closing of BuildX Design. Teams wrap up and depart.",
-    start: "2026-02-02T10:00:00+05:30",
-    end: "2026-02-02T10:00:00+05:30",
+    stage: "event",
+    dateKey: "2026-02-02",
+    dateObj: new Date("2026-02-02T00:00:00+05:30"),
+    rangeLabel: "02 Feb 26, 12:00 AM → 10:00 AM",
+    items: [
+      {
+        title: "Phase 2 – Designing",
+        desc: "Overnight design and final improvements.",
+        timeRange: "12:00 AM → 08:15 AM",
+        start: "2026-02-02T00:00:00+05:30",
+        end: "2026-02-02T08:15:00+05:30",
+      },
+      {
+        title: "Final Submission Closes",
+        desc: "Design submissions are closed.",
+        timeRange: "08:15 AM",
+        start: "2026-02-02T08:15:00+05:30",
+        end: "2026-02-02T08:15:00+05:30",
+      },
+      {
+        title: "Final Design Presentation",
+        desc: "Final presentations and evaluation.",
+        timeRange: "08:30 AM → 10:00 AM",
+        start: "2026-02-02T08:30:00+05:30",
+        end: "2026-02-02T10:00:00+05:30",
+      },
+      {
+        title: "Event Ends & Pack-up",
+        desc: "Official closing of BuildX Design.",
+        timeRange: "10:00 AM",
+        start: "2026-02-02T10:00:00+05:30",
+        end: "2026-02-02T10:00:00+05:30",
+      },
+    ],
   },
 ],
       mentors: [{ name: "Alex Rivera", role: "UX Director" }],
@@ -1186,7 +1226,7 @@ timeline: [
       title: "BuildX Dev",
       phase: "DEV",
       startDate: new Date("2026-01-17T10:00:00+05:30"),
-      registrationOpensAt: new Date("2026-02-02T23:59:00+05:30"),
+      registrationOpensAt: new Date("2026-02-10T10:00:00+05:30"),
       registrationClosesAt: new Date("2026-02-16T23:59:00+05:30"),
       image: "/assets/event-posters/dev.png",
       short: `Turn designs into real, working products.
@@ -1266,8 +1306,8 @@ original problem statement.`,
 
         <Grid container spacing={4} mx="auto" maxWidth={1000} px={3} py={1}>
           {events.map((event) => (
-            <Grid item xs={12} md={6} mx="auto" key={event.id}>
-              <EventCard event={event} onViewMore={setSelectedEvent} />
+            <Grid item xs={12} md={6} mx="auto" key={event.id} sx={{ gap: 2 }}>
+              <EventCard event={event} onViewMore={setSelectedEvent} sx={{ mb: 2 }} />
             </Grid>
           ))}
         </Grid>

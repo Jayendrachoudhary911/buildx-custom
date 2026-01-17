@@ -6,9 +6,23 @@ import {
   Button,
   Container,
   Grid,
+  IconButton,
+  Tooltip,
+  CircularProgress,
 } from "@mui/material";
+import { Mail, Phone, MessageCircle } from "lucide-react";
+
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
+/* ================= CONFIG ================= */
+
+// Ensure this URL is from your LATEST "New Deployment" in Apps Script
+const APPSCRIPT_ENDPOINT =
+  "https://script.google.com/macros/s/AKfycbwdmbZTBsopysMrsOhlZmFadfalpXL8ePY5cbK8loCvvrZ9yP1fc2r47iaVdLFtEVCYXA/exec";
 
 /* ───────── CONFETTI ENGINE ───────── */
+
 function ConfettiBurst({ run }) {
   const canvasRef = useRef(null);
 
@@ -34,6 +48,7 @@ function ConfettiBurst({ run }) {
     }));
 
     let frame;
+
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -71,96 +86,148 @@ function ConfettiBurst({ run }) {
   );
 }
 
-/* ───────── CONTACT PAGE ───────── */
-export default function ContactUs() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
+const CommonGridCard = ({ children }) => {
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        p: 4,
+        height: "100%",
+        borderRadius: 2,
+        width: { xs: "90vw", md: 250 },
 
-  const handleSubmit = (e) => {
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+
+        border: "1px solid rgba(255,255,255,0.12)",
+
+        backdropFilter: "blur(22px) saturate(130%)",
+
+        boxShadow: "none",
+
+        textAlign: "center",
+
+        transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
+
+        "&:hover": {
+          transform: "translateY(-1px) scale(1.02)",
+          boxShadow: "none",
+        },
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
+
+
+/* ================= CONTACT PAGE ================= */
+
+export default function ContactUs() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  /* ---------- SUBMIT HANDLER ---------- */
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // TODO: connect backend / email service
-    console.log(form);
+    try {
+      setLoading(true);
 
-    setSubmitted(true);
-    setForm({ name: "", email: "", message: "" });
+      const payload = {
+        name: form.name,
+        email: form.email,
+        message: form.message,
+        createdAt: new Date().toISOString(),
+      };
 
-    setTimeout(() => setSubmitted(false), 4500);
+      /* 1️⃣ SAVE TO FIRESTORE */
+      await addDoc(collection(db, "contactSubmissions"), {
+        ...payload,
+        createdAt: serverTimestamp(),
+      });
+
+      /* 2️⃣ SEND TO GOOGLE SHEETS + EMAIL (APPS SCRIPT) */
+      // Using mode: 'no-cors' and text/plain to bypass CORS browser restrictions
+      await fetch(APPSCRIPT_ENDPOINT, {
+        method: "POST",
+        mode: "no-cors", 
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      /* SUCCESS HANDLING */
+      // In 'no-cors' mode, we won't get a readable JSON response, 
+      // so we assume success if the fetch doesn't throw an error.
+      setSubmitted(true);
+      setForm({ name: "", email: "", message: "" });
+
+      setTimeout(() => setSubmitted(false), 4500);
+    } catch (error) {
+      console.error("Submission Error:", error);
+      alert("Submission failed. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  /* ---------- TEAM DATA ---------- */
+
+  const team = [
+    {
+      name: "Jayendra Choudhary",
+      role: "Founder / Organizer",
+      email: "jayendrachoudhary911@gmail.com",
+      phone: "+91 7689919139",
+      whatsapp: "7689919139",
+    },
+    {
+      name: "Mohit Sharma",
+      role: "Founder / Organizer",
+      email: "mohitsharmahack810@gmail.com",
+      phone: "+91 8109618103",
+      whatsapp: "8109618103",
+    },
+    {
+      name: "Raunak Bansal",
+      role: "Lead Organizer",
+      email: "raunakbansal000@gmail.com",
+      phone: "+91 8239577135",
+      whatsapp: "8239577135",
+    },
+    {
+      name: "Naman Soni",
+      role: "Lead Organizer",
+      email: "soninamanp@gmail.com",
+      phone: "+91 9664464843",
+      whatsapp: "9664464843",
+    },
+  ];
+
   return (
-    <Box sx={{ bgcolor: "#00000000", color: "#fff", py: 14 }}>
+    <Box sx={{ bgcolor: "transparent", color: "#fff", py: 14 }}>
       {submitted && <ConfettiBurst run={submitted} />}
 
-      {/* SUCCESS OVERLAY */}
-      {submitted && (
-        <Box
-          sx={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 2500,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            bgcolor: "rgba(0,0,0,0.55)",
-            backdropFilter: "blur(20px)",
-          }}
-        >
-          <Box
-            sx={{
-              p: 6,
-              borderRadius: 3,
-              textAlign: "center",
-              bgcolor: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              animation: "pop 0.4s cubic-bezier(.16,1,.3,1)",
-              "@keyframes pop": {
-                from: { transform: "scale(0.85)", opacity: 0 },
-                to: { transform: "scale(1)", opacity: 1 },
-              },
-            }}
-          >
-            <Box
-              sx={{
-                width: 80,
-                height: 80,
-                mx: "auto",
-                mb: 3,
-                borderRadius: "50%",
-                bgcolor: "rgba(108,255,142,0.18)",
-                color: "#6CFF8E",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 36,
-                fontWeight: 900,
-                boxShadow: "0 0 40px rgba(108,255,142,0.6)",
-              }}
-            >
-              ✓
-            </Box>
-
-            <Typography sx={{ fontWeight: 900, fontSize: 22 }}>
-              Message Sent!
-            </Typography>
-            <Typography sx={{ opacity: 0.7, mt: 1 }}>
-              We’ll get back to you shortly 🚀
-            </Typography>
-          </Box>
-        </Box>
-      )}
-
-      <Container maxWidth="md">
+      <Container maxWidth="lg">
         {/* HEADER */}
         <Typography
           sx={{
             fontWeight: 900,
-            fontSize: "3.2rem",
+            fontSize: { xs: "2.6rem", md: "3.4rem" },
             mb: 2,
             textAlign: "center",
           }}
         >
-          Contact Us
+          Contact BuildX
         </Typography>
 
         <Typography
@@ -168,12 +235,12 @@ export default function ContactUs() {
             textAlign: "center",
             opacity: 0.65,
             mb: 8,
-            maxWidth: 600,
+            maxWidth: 620,
             mx: "auto",
           }}
         >
-          Questions about BuildX, collaborations, or partnerships?  
-          Drop us a message — we’d love to talk.
+          Messages submitted here are securely stored and forwarded to our
+          support team. You will also receive a confirmation email.
         </Typography>
 
         {/* FORM */}
@@ -181,36 +248,51 @@ export default function ContactUs() {
           component="form"
           onSubmit={handleSubmit}
           sx={{
-            p: 5,
-            borderRadius: 3,
-            bgcolor: "rgba(255,255,255,0.035)",
+            p: { xs: 3.5, md: 5 },
+            borderRadius: 2,
+            bgcolor: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.1)",
-            backdropFilter: "blur(30px)",
+            backdropFilter: "blur(28px)",
+            boxShadow: "none",
+            width: { xs: "90vw", md: "50vw" },
+            mx: "auto"
           }}
         >
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Box
+              sx={{ 
+                display: "flex",
+                width: "100vw",
+                gap: 2
+              }}
+            >
               <TextField
                 fullWidth
                 label="Your Name"
+                variant="outlined"
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, name: e.target.value })
+                }
                 required
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-root": { color: "#fff", "& fieldset": { borderColor: "rgba(255,255,255,0.2)" } } }}
               />
-            </Grid>
 
-            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Email Address"
                 type="email"
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, email: e.target.value })
+                }
                 required
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-root": { color: "#fff", "& fieldset": { borderColor: "rgba(255,255,255,0.2)" } } }}
               />
-            </Grid>
+            </Box>
 
-            <Grid item xs={12}>
               <TextField
                 fullWidth
                 multiline
@@ -221,144 +303,133 @@ export default function ContactUs() {
                   setForm({ ...form, message: e.target.value })
                 }
                 required
+                InputLabelProps={{ style: { color: "#fff" } }}
+                sx={{ "& .MuiOutlinedInput-root": { color: "#fff", "& fieldset": { borderColor: "rgba(255,255,255,0.2)" } } }}
               />
-            </Grid>
-
-            <Grid item xs={12}>
+              
               <Button
                 type="submit"
                 fullWidth
+                disabled={loading}
                 sx={{
-                  py: 2,
+                  py: 2.1,
                   borderRadius: 2,
-                  bgcolor: "#fff",
-                  color: "#000",
+                  bgcolor: "#ffffff",
+                  color: "#000000",
                   fontWeight: 900,
                   fontSize: 16,
                   "&:hover": {
-                    bgcolor: "#f0f0f0",
-                    transform: "scale(1.02)",
+                    bgcolor: "#000000", 
+                    color: "#ffffff",
+                    transform: "scale(1.03)",
                   },
+                  "&.Mui-disabled": {
+                    bgcolor: "rgba(255, 255, 255, 0.3)",
+                  }
                 }}
               >
-                Send Message
+                {loading ? (
+                  <CircularProgress size={22} sx={{ color: "#000" }} />
+                ) : (
+                  "Send Message"
+                )}
               </Button>
             </Grid>
-          </Grid>
-        </Box>
+        </Box>  
 
-        {/* TEAM */}
-        <Box sx={{ mt: 12 }}>
-          <Typography
-            sx={{
-              fontWeight: 900,
-              fontSize: "2rem",
-              mb: 5,
-              textAlign: "center",
-            }}
-          >
-            Talk to the Team
-          </Typography>
+        {/* TEAM CONTACT CARDS */}
+<Box sx={{ mt: 14 }}>
 
-          <Grid container spacing={4} justifyContent="center">
-            {[
-              {
-                name: "Jayendra Choudhary",
-                role: "Founder / Product",
-                email: "jayendra@bunkmates.in",
-              },
-              {
-                name: "BuildX Support",
-                role: "Community & Events",
-                email: "support@bunkmates.in",
-              },
-            ].map((m, i) => (
-              <Grid item xs={12} sm={6} md={4} key={i}>
-                <Box
-                  sx={{
-                    p: 4,
-                    borderRadius: 3,
-                    bgcolor: "rgba(255,255,255,0.035)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    textAlign: "center",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 64,
-                      height: 64,
-                      mx: "auto",
-                      mb: 2,
-                      borderRadius: "50%",
-                      bgcolor: "rgba(108,255,142,0.15)",
-                      color: "#6CFF8E",
-                      fontWeight: 900,
-                      fontSize: 22,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {m.name[0]}
-                  </Box>
+  {/* SECTION HEADER */}
+  <Typography
+    sx={{
+      fontWeight: 900,
+      fontSize: { xs: "1.8rem", md: "2.2rem" },
+      mb: 7,
+      textAlign: "center",
+      letterSpacing: "-0.02em",
+      background:
+        "linear-gradient(90deg, #ffffff, #d8d8d8)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+    }}
+  >
+    Talk to the BuildX Team
+  </Typography>
 
-                  <Typography sx={{ fontWeight: 800 }}>
-                    {m.name}
-                  </Typography>
-                  <Typography sx={{ opacity: 0.6, mb: 1 }}>
-                    {m.role}
-                  </Typography>
-                  <Typography sx={{ color: "#6CFF8E", fontSize: 14 }}>
-                    {m.email}
-                  </Typography>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+  <Grid container spacing={2} justifyContent="center">
+    {team.map((m, i) => (
+<Grid item xs={12} sm={6} md={4} key={i}>
+  <CommonGridCard>
 
-        {/* CTA */}
-        <Box sx={{ mt: 14, textAlign: "center" }}>
-          <Typography sx={{ fontWeight: 900, fontSize: "2rem", mb: 2 }}>
-            Prefer Instant Chat?
-          </Typography>
+    {/* AVATAR */}
+    <Box
+      sx={{
+        width: 72,
+        height: 72,
+        mx: "auto",
+        mb: 2,
+        borderRadius: "50%",
+        bgcolor: "rgba(108,255,142,0.18)",
+        color: "#6CFF8E",
+        fontWeight: 900,
+        fontSize: 26,
+        display: { xs: "none", md: "flex" },
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {m.name[0]}
+    </Box>
 
-          <Typography sx={{ opacity: 0.65, mb: 5 }}>
-            Reach us directly on WhatsApp or Telegram
-          </Typography>
+    {/* NAME */}
+    <Typography fontWeight={800}>
+      {m.name}
+    </Typography>
 
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 3 }}>
-            <Button
-              href="https://wa.me/91XXXXXXXXXX"
-              target="_blank"
-              sx={{
-                px: 5,
-                py: 2,
-                borderRadius: 999,
-                bgcolor: "#25D366",
-                color: "#000",
-                fontWeight: 900,
-              }}
-            >
-              WhatsApp
-            </Button>
+    {/* ROLE */}
+    <Typography sx={{ opacity: 0.6, mb: 2 }}>
+      {m.role}
+    </Typography>
 
-            <Button
-              href="https://t.me/yourtelegram"
-              target="_blank"
-              sx={{
-                px: 5,
-                py: 2,
-                borderRadius: 999,
-                bgcolor: "#229ED9",
-                color: "#fff",
-                fontWeight: 900,
-              }}
-            >
-              Telegram
-            </Button>
-          </Box>
-        </Box>
+    {/* ACTION BUTTONS */}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        gap: 2,
+      }}
+    >
+      <Tooltip title="Email">
+        <IconButton href={`mailto:${m.email}`} sx={{ color: "#fff" }}>
+          <Mail size={18} />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title="Call">
+        <IconButton href={`tel:${m.phone}`} sx={{ color: "#fff" }}>
+          <Phone size={18} />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title="WhatsApp">
+        <IconButton
+          href={`https://wa.me/${m.whatsapp}?text=Hi%20BuildX%20CUSTOM%20Team%20%F0%9F%91%8B%0AI%E2%80%99m%20reaching%20out%20regarding%20BuildX%20CUSTOM%20events%20and%20participation.%0ACould%20you%20please%20guide%20me%20further%3F%0AThanks%21`}
+          target="_blank"
+          sx={{ color: "#fff" }}
+        >
+          <MessageCircle size={18} />
+        </IconButton>
+      </Tooltip>
+    </Box>
+
+  </CommonGridCard>
+</Grid>
+
+    ))}
+  </Grid>
+</Box>
+
       </Container>
     </Box>
   );

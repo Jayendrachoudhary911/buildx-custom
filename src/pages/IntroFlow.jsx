@@ -114,7 +114,7 @@ export default function IntroFlow({ onComplete }) {
             initial={{ opacity: 0, y: -40, scale: 0.92, filter: "blur(12px)" }}
             animate={{
               opacity: 1,
-              y: screen.type === "hero" ? 130 : 0,
+              y: screen.type === "hero" ? 90 : 0,
               scale: 1,
               filter: "blur(0px)",
             }}
@@ -161,7 +161,7 @@ export default function IntroFlow({ onComplete }) {
             initial={{ opacity: 0, y: 60, scale: 0.95 }}
             animate={{
               opacity: 1,
-              y: screen.type === "hero" ? -130 : 0,
+              y: screen.type === "hero" ? -80 : 0,
               scale: 1,
             }}
             transition={{ delay: 0.9, duration: 1.3, ease: SOFT_EASE }}

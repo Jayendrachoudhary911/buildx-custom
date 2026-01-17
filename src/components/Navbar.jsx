@@ -8,15 +8,35 @@ import {
   Avatar,
   SwipeableDrawer,
 } from "@mui/material";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Youtube } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Home,
+  Palette,
+  Code2,
+  Users,
+  Mail,
+  Instagram,
+  Linkedin,
+} from "lucide-react";
+import { FaDiscord } from "react-icons/fa";
+
 
 const NAV_ITEMS = [
-  { label: "Home", id: "/" },
-  { label: "Events", id: "/events" },
-  { label: "Your Team", id: "/your-team" },
-  { label: "Contact Us", id: "/contact-us" },
+  { label: "Home", id: "/", icon: Home },
+
+  // Design hackathon (creative / UI)
+  { label: "Design Event", id: "/design-event", icon: Palette },
+
+  // Development hackathon (coding)
+  { label: "Dev Event", id: "/dev-event", icon: Code2 },
+
+  // Team management
+  { label: "Your Team", id: "/your-team", icon: Users },
+
+  // Contact / Support
+  { label: "Contact Us", id: "/contact-us", icon: Mail },
 ];
 
 export default function Navbar() {
@@ -264,6 +284,7 @@ useEffect(() => {
         {/* CTA + MOBILE */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Button
+            onClick={() => navigate("/events")}
             sx={{
               px: 3,
               py: 0.8,
@@ -278,7 +299,7 @@ useEffect(() => {
               },
             }}
           >
-            Notify Me
+            Register Now
           </Button>
 
           <IconButton
@@ -291,45 +312,219 @@ useEffect(() => {
       </Box>
 
       {/* ───────── MOBILE DRAWER ───────── */}
-      <SwipeableDrawer
-        anchor="right"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        PaperProps={{
-          sx: {
-            width: "100%",
-            background:
-              "linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))",
-            backdropFilter: "blur(40px) brightness(1.95)",
+<SwipeableDrawer
+  anchor="bottom"
+  open={drawerOpen}
+  onClose={() => setDrawerOpen(false)}
+  onOpen={() => setDrawerOpen(true)}
+
+  // BACKDROP BLUR + SHADOW LAYER
+  ModalProps={{
+    BackdropProps: {
+      sx: {
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        backdropFilter: "blur(12px) saturate(140%)",
+        WebkitBackdropFilter: "blur(12px) saturate(140%)",
+        transition: "all 0.35s ease",
+      },
+    },
+  }}
+
+  PaperProps={{
+    sx: {
+      width: { xs: "92%", sm: 380 },
+      height: "80vh",
+
+      background:
+        "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05))",
+
+      backdropFilter: "blur(26px)",
+      WebkitBackdropFilter: "blur(26px)",
+
+      boxShadow:
+        "none",
+
+      mx: "auto",
+      my: 2,
+
+      borderRadius: 1,
+
+      border: "1px solid rgba(255,255,255,0.12)",
+    },
+  }}
+>
+
+
+  <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+
+    {/* ───────── HEADER / PROFILE AREA ───────── */}
+    <Box
+      sx={{
+        px: 3,
+        py: 2.5,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+    {/* ───────── DIVIDER ───────── */}
+      <Box display="flex" alignItems="center" gap={1.5}>
+        <Box>
+          <Typography fontWeight={800} fontSize={18} sx={{ color: "#ffffff99" }}>
+            BuildX CUSTOM
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Close Button */}
+      <IconButton
+        onClick={() => setDrawerOpen(false)}
+        sx={{
+          bgcolor: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          backdropFilter: "blur(10px)",
+          transition: "all 0.25s ease",
+          "&:hover": {
+            bgcolor: "rgba(255,255,255,0.15)",
+            transform: "rotate(90deg)",
           },
         }}
       >
-        <Box sx={{ p: 3 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-            <Typography fontSize={22}>BUILDX</Typography>
-            <IconButton onClick={() => setDrawerOpen(false)}>
-              <X />
-            </IconButton>
-          </Box>
+        <X size={20} />
+      </IconButton>
+    </Box>
 
-          {NAV_ITEMS.map((item) => (
-            <Typography
+    {/* ───────── NAVIGATION SECTION ───────── */}
+    <Box sx={{ px: 3, py: 3, flex: 1 }}>
+
+      <Typography
+        sx={{
+          fontSize: 11,
+          letterSpacing: "0.3em",
+          opacity: 0.45,
+          mb: 2,
+          fontWeight: 700,
+        }}
+      >
+        NAVIGATION
+      </Typography>
+
+      <Box display="flex" flexDirection="column" gap={1}>
+
+        {NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <Box
               key={item.id}
               tabIndex={0}
               onClick={() => handleNavClick(item)}
               sx={{
-                py: 1.6,
-                fontSize: 16,
-                fontWeight: 600,
+                px: 2.5,
+                py: 1.8,
+                borderRadius: 1,
                 cursor: "pointer",
-                opacity: active === item.id ? 1 : 0.6,
+
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+
+                fontSize: 15,
+                fontWeight: 700,
+
+                color: active === item.id ? "#fff" : "rgba(255,255,255,0.6)",
+
+                background: "rgba(255, 255, 255, 0.03)",
+
+                border:
+                  active === item.id
+                    ? "1px solid rgba(108,255,142,0.4)"
+                    : "1px solid transparent",
+
+                transition: "all 0.25s ease",
+
+                "&:hover": {
+                  background: "rgba(255,255,255,0.08)",
+                  transform: "translateX(-6px)",
+                },
+
+                "&:focus-visible": {
+                  outline: "2px solid rgba(108,255,142,0.6)",
+                  outlineOffset: 2,
+                },
               }}
             >
-              {item.label}
-            </Typography>
-          ))}
-        </Box>
-      </SwipeableDrawer>
+              {/* LEFT ICON + LABEL */}
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <Icon size={18} />
+
+                {item.label}
+              </Box>
+
+              {/* ACTIVE INDICATOR */}
+              {active === item.id && (
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: "#6cff8e",
+                    boxShadow: "0 0 10px rgba(108,255,142,0.8)",
+                  }}
+                />
+              )}
+            </Box>
+          );
+        })}
+
+      </Box>
+    </Box>  
+
+    {/* ───────── SOCIAL LINKS ───────── */}
+    <Box
+      sx={{
+        px: 3,
+        pb: 3,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <Typography
+        sx={{
+          fontSize: 11,
+          opacity: 0.5,
+          letterSpacing: "0.2em",
+          fontWeight: 700,
+        }}
+      >
+        FOLLOW BUNKMATES
+      </Typography>
+
+      <Box display="flex" gap={1.5}>
+        {/* Example social icons */}
+        <IconButton onClick={() => navigate("https://www.instagram.com/bunkmates.app/")} sx={{ color: "#fff", opacity: 0.7 }}>
+          <Instagram size={18} />
+        </IconButton>
+
+        <IconButton sx={{ color: "#fff", opacity: 0.7 }}>
+          <FaDiscord size={18} />
+        </IconButton>
+
+        <IconButton onClick={() => navigate("https://www.linkedin.com/company/bunkmates/")} sx={{ color: "#fff", opacity: 0.7 }}>
+          <Linkedin size={18} />
+        </IconButton>
+        
+        <IconButton onClick={() => navigate("https://www.youtube.com/@Team_BunkMates")} sx={{ color: "#fff", opacity: 0.7 }}>
+          <Youtube size={18} />
+        </IconButton>
+      </Box>
+    </Box>
+
+  </Box>
+</SwipeableDrawer>
+
     </>
   );
 }

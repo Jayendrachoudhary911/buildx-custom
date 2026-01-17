@@ -1,271 +1,352 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Chip } from "@mui/material";
 import {
   UserPlus,
+  Users,
+  PlayCircle,
+  FileText,
   PenTool,
-  ClipboardCheck,
   Code2,
+  ClipboardCheck,
   Presentation,
+  Lock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-const steps = [
+/* ───────── Steps Data ───────── */
+
+const designSteps = [
   {
-    id: "register",
     step: "01",
-    title: "Register",
-    desc: "Register individually or with your team to participate.",
+    title: "Registration (via Unstop)",
+    desc: "Register individually or as a team on Unstop. Payment link will be sent to registered participants via email.",
     icon: UserPlus,
   },
   {
-    id: "design",
     step: "02",
-    title: "Design Phase (Online)",
-    desc: "Research problems, define users, and design practical solutions.",
+    title: "Team Verification",
+    desc: "After successful fee payment, verified teams will receive official entry passes directly on their registered email.",
+    icon: Users,
+  },
+  {
+    step: "03",
+    title: "Event Starts",
+    desc: "Kickoff session with rules and orientation.",
+    icon: PlayCircle,
+  },
+  {
+    step: "04",
+    title: "Problem Statement Release",
+    desc: "Official problem statements are revealed to participants.",
+    icon: FileText,
+  },
+  {
+    step: "05",
+    title: "Enjoy Designing",
+    desc: "Start designing innovative UI/UX solutions.",
     icon: PenTool,
   },
+];
+
+const devSteps = [
   {
-    id: "review",
-    step: "03",
-    title: "Review & Shortlisting",
-    desc: "Designs are evaluated and shortlisted for the next phase.",
-    icon: ClipboardCheck,
+    step: "01",
+    title: "BuildX CUSTOM",
+    desc: "BuildX CUSTOM",
+    icon: UserPlus,
   },
   {
-    id: "development",
-    step: "04",
-    title: "Development Phase (Offline)",
-    desc: "Build working prototypes under real-world constraints.",
+    step: "02",
+    title: "BuildX CUSTOM",
+    desc: "Build real it in BuildX CUSTOM",
     icon: Code2,
   },
   {
-    id: "present",
-    step: "05",
-    title: "Present & Iterate",
-    desc: "Demo your product, receive feedback, and refine.",
+    step: "03",
+    title: "BuildX CUSTOM",
+    desc: "optimization.",
+    icon: ClipboardCheck,
+  },
+  {
+    step: "04",
+    title: "BuildX CUSTOM",
+    desc: "BuildX CUSTOM",
     icon: Presentation,
   },
 ];
 
-/* ───────── Motion Variants ───────── */
+/* ───────── Animations ───────── */
+
 const containerVariants = {
   hidden: {},
   show: {
-    transition: {
-      staggerChildren: 0.25,
-    },
+    transition: { staggerChildren: 0.15 },
   },
 };
 
-const itemVariants = {
-  hidden: {
-    opacity: 0,
-    y: 60,
-    filter: "blur(8px)",
-  },
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
   show: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
+    scale: 1,
     transition: {
       type: "spring",
-      stiffness: 90,
+      stiffness: 120,
       damping: 18,
     },
   },
 };
 
-const dotVariants = {
-  hidden: { scale: 0.6, opacity: 0.4 },
-  show: {
-    scale: 1,
-    opacity: 1,
-    transition: { type: "spring", stiffness: 300 },
-  },
-};
+/* ───────── Step Card ───────── */
 
-/* ───────── Timeline Step ───────── */
-function TimelineStep({ item, index }) {
+function StepCard({ item, accent }) {
   const Icon = item.icon;
-  const isLeft = index % 2 === 0;
 
   return (
-    <motion.div variants={itemVariants}>
+    <motion.div variants={cardVariants}>
       <Box
         sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            md: "1fr 80px 1fr",
+          p: 3,
+          borderRadius: 2,
+          height: "100%",
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          transition: "0.25s ease",
+          "&:hover": {
+            transform: "translateY(-6px)",
+            boxShadow: "0 18px 40px rgba(250, 250, 250, 0.1)",
           },
-          alignItems: "center",
-          mb: { xs: 6, md: 12 },
         }}
       >
-        {/* CONTENT */}
         <Box
-          sx={{
-            gridColumn: { md: isLeft ? 1 : 3 },
-            textAlign: { md: isLeft ? "right" : "left" },
-
-            backdropFilter: "blur(0px)",
-            background:
-              "none",
-            border: "none",
-            borderRadius: 4,
-
-            pl: { xs: 6, md: 0 },
-            pr: { xs: 1, md: 0 },
-            py: { xs: 3, md: 0 },
-            mx: { xs: "auto", md: 0 },
-            maxWidth: { xs: 520, md: "unset" },
-
-            boxShadow: "none",
-          }}
-          component={motion.div}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={2}
         >
           <Typography
             sx={{
-              fontSize: 11,
-              letterSpacing: "0.3em",
+              fontSize: 12,
+              letterSpacing: "0.25em",
               opacity: 0.6,
-              mb: 0.8,
             }}
           >
             STEP {item.step}
           </Typography>
 
-          <Typography
+          <Box
             sx={{
-              fontSize: { xs: 16, md: 18 },
-              fontWeight: 600,
-              mb: 1,
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: accent,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#000",
+              boxShadow: "0 0 18px rgba(255,255,255,0.35)",
             }}
           >
-            {item.title}
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: 14.5,
-              lineHeight: 1.75,
-              opacity: 0.78,
-            }}
-          >
-            {item.desc}
-          </Typography>
+            <Icon size={18} strokeWidth={2.2} />
+          </Box>
         </Box>
 
-        {/* CENTER DOT (desktop only) */}
-        <Box
+        <Typography fontWeight={600} mb={1}>
+          {item.title}
+        </Typography>
+
+        <Typography
           sx={{
-            display: { xs: "none", md: "flex" },
-            justifyContent: "center",
-            position: "absolute",
-            left: "48.2%",
-            gridColumn: 2,
+            fontSize: 14.5,
+            lineHeight: 1.7,
+            opacity: 0.8,
           }}
         >
-          <motion.div variants={dotVariants}>
-              <Box
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: "50%",
-                  background: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                
-                  boxShadow:
-                    "0 0 0 8px rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.6)",
-                
-                  color: "#000", // icon color
-                }}
-              >
-                <Icon size={14} strokeWidth={2.2} />
-              </Box>
-          </motion.div>
-        </Box>
-
-        {/* MOBILE ICON */}
-<Box
-    sx={{
-        display: { xs: "flex", md: "none" },
-        position: "absolute",
-        left: -12,
-    }}
->
-    <Box
-      sx={{
-        width: 28,
-        height: 28,
-        borderRadius: "50%",
-        background: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-
-        boxShadow:
-          "0 0 0 8px rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.6)",
-
-        color: "#000", // icon color
-      }}
-    >
-      <Icon size={14} strokeWidth={2.2} />
-    </Box>
-</Box>
+          {item.desc}
+        </Typography>
       </Box>
     </motion.div>
   );
 }
 
-/* ───────── Timeline Container ───────── */
-export default function HowItWorksTimeline() {
+/* ───────── MAIN SECTION ───────── */
+
+export default function HowItWorksCards() {
   return (
-    <Box
-      maxWidth={1100}
-      mx="auto"
-      px={{ xs: 2, md: 3 }}
-      py={{ xs: 8, md: 14 }}
-      position="relative"
-    >
+    <Box maxWidth={1200} mx="auto" px={{ xs: 2, md: 3 }} py={{ xs: 8, md: 14 }}>
+      {/* Title */}
       <Typography
         variant="h4"
-        mb={{ xs: 6, md: 10 }}
-        sx={{
-          fontWeight: 600,
-          letterSpacing: "-0.02em",
-          textAlign: "center",
-        }}
+        textAlign="center"
+        mb={8}
+        sx={{ fontWeight: 600 }}
       >
-        How It Works
+        How It Works — BuildX CUSTOMS
       </Typography>
 
-      <Box sx={{ position: "relative", pl: 2 }}>
-        {/* CENTER LINE (desktop only) */}
-        <Box
-          sx={{
-            display: "block",
-            position: "absolute",
-            left: { xs: 18, lg: "50%" },
-            top: 0,
-            bottom: 0,
-            width: 2,
-            transform: "translateX(-50%)",
-            background: "rgba(255,255,255,0.12)",
-          }}
-        />
+      {/* ============ DESIGN HACKATHON ============ */}
+
+      <Box mb={7}>
+        <Box display="flex" alignItems="center" gap={2} mb={4}>
+          <Typography variant="h5" fontWeight={600}>
+            Design Hackathon
+          </Typography>
+
+          <Chip
+            label="ONLINE"
+            size="small"
+            sx={{
+              bgcolor: "rgba(255, 185, 120, 0.15)",
+              color: "#ffc89b",
+              fontWeight: 600,
+            }}
+          />
+        </Box>
 
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true }}
         >
-          {steps.map((item, index) => (
-            <TimelineStep key={item.id} item={item} index={index} />
-          ))}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(5, 1fr)",
+              },
+              gap: 2,
+            }}
+          >
+            {designSteps.map((item, i) => (
+              <StepCard
+                key={i}
+                item={item}
+                accent="linear-gradient(135deg, #ffffff, #ffffff)"
+              />
+            ))}
+          </Box>
         </motion.div>
+      </Box>
+
+      {/* ============ DEV HACKATHON (LOCKED) ============ */}
+
+      <Box position="relative">
+        <Box display="flex" alignItems="center" gap={2} mb={4}>
+          <Typography variant="h5" fontWeight={600}>
+            Development Hackathon
+          </Typography>
+
+          <Chip
+            label="OFFLINE"
+            size="small"
+            sx={{
+              bgcolor: "rgba(255, 255, 255, 0.15)",
+              color: "#ffffff",
+              fontWeight: 600,
+            }}
+          />
+        </Box>
+
+        {/* Content (Blurred) */}
+        {/* <Box
+          sx={{
+            filter: "blur(26px) brightness(0.9)",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+          >
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(4, 1fr)",
+                },
+                gap: 3,
+              }}
+            >
+              {devSteps.map((item, i) => (
+                <StepCard
+                  key={i}
+                  item={item}
+                  accent="linear-gradient(135deg, #ff9800, #ff5722)"
+                />
+              ))}
+            </Box>
+          </motion.div>
+        </Box> */}
+
+        {/* Lock Overlay */}
+        <Box
+          component={motion.div}
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          sx={{
+            position: "relative",
+            inset: 0,
+            p: 6,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            borderRadius: 3,
+            background:
+              "linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.09))",
+            backdropFilter: "blur(42px)",
+            border: "1px dashed #ffffff5f"
+          }}
+        >
+          <Box
+            sx={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              background:
+                "linear-gradient(135deg, #ffffffaa, #ffffffbd)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#000",
+              boxShadow: "0 0 40px rgba(255, 255, 255, 0.49)",
+            }}
+          >
+            <Lock size={28} />
+          </Box>
+
+          <Typography
+            sx={{
+              fontSize: 20,
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+            }}
+          >
+            Releasing Soon
+          </Typography>
+
+          <Typography
+            sx={{
+              fontSize: 14,
+              opacity: 0.75,
+              textAlign: "center",
+              maxWidth: 300,
+            }}
+          >
+            Development Hackathon details will be unlocked after Design Phase.
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );
