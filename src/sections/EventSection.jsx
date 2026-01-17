@@ -1225,7 +1225,7 @@ timeline: [
       id: "buildx-dev",
       title: "BuildX Dev",
       phase: "DEV",
-      startDate: new Date("2026-01-17T10:00:00+05:30"),
+      startDate: new Date("2026-03-01T10:00:00+05:30"),
       registrationOpensAt: new Date("2026-02-10T10:00:00+05:30"),
       registrationClosesAt: new Date("2026-02-16T23:59:00+05:30"),
       image: "/assets/event-posters/dev.png",
