@@ -3,7 +3,7 @@ import {
   Box,
   Typography,
   Button,
-  Drawer,
+  // Drawer,
   IconButton,
   Avatar,
   SwipeableDrawer,
@@ -42,7 +42,7 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [active, setActive] = useState("about");
-  const [hidden, setHidden] = useState(false);
+  // const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const lastScroll = useRef(0);

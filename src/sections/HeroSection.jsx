@@ -1,10 +1,10 @@
-import { useEffect, useState, memo } from "react";
+// import { useEffect, useState, memo } from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
 import BuildXLogoAnimated from "../components/BuildXLogo";
-import AnimatedDigit from "../components/AnimatedDigit";
+// import AnimatedDigit from "../components/AnimatedDigit";
 import { useNavigate } from "react-router-dom";
 
-const TARGET_DATE = new Date("2026-01-17T10:00:00+05:30").getTime();
+// const TARGET_DATE = new Date("2026-01-17T10:00:00+05:30").getTime();
 
 /** * 1. Optimized Hook: Refined RAF logic to be even lighter.
  * We calculate the object state only once per second.

@@ -19,13 +19,13 @@ Never hardcode real keys in public repos.
 */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDy2dmvol33xFAptmFaI_tJmm4qI0a9CVk",
-  authDomain: "codym-6bd19.firebaseapp.com",
-  projectId: "codym-6bd19",
-  storageBucket: "codym-6bd19.firebasestorage.app",
-  messagingSenderId: "811312845188",
-  appId: "1:811312845188:web:12d6d556d331387a60cdd1",
-  measurementId: "G-SML1B89SL9"
+apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 /* ================= INITIALIZE ================= */

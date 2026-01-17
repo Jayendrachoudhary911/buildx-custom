@@ -1,7 +1,7 @@
 import React, {
   useState,
   useEffect,
-  forwardRef,
+  // forwardRef,
   memo,
   useRef,
   useCallback,
@@ -14,9 +14,9 @@ import {
   Button,
   IconButton,
   Dialog,
-  Slide,
+  // Slide,
   Container,
-  Avatar,
+  // Avatar,
   Divider,
   Accordion,
   AccordionSummary,
@@ -25,21 +25,21 @@ import {
 import { X, Calendar, MapPin, Globe, Clock, ShieldCheck, HelpCircle, ChevronDown } from "lucide-react";
 
 /* ───────── CONSTANTS ───────── */
-const TRANSITION_EASING_IN = "cubic-bezier(0.16, 1, 0.3, 1)";
-const TRANSITION_EASING_OUT = "cubic-bezier(0.7, 0, 0.84, 0)";
+// const TRANSITION_EASING_IN = "cubic-bezier(0.16, 1, 0.3, 1)";
+// const TRANSITION_EASING_OUT = "cubic-bezier(0.7, 0, 0.84, 0)";
 
 /* ───────── 1. ANIMATED TRANSITION ───────── */
-const Transition = forwardRef(function Transition(props, ref) {
-  return (
-    <Slide
-      direction="up"
-      ref={ref}
-      timeout={{ enter: 600, exit: 400 }}
-      easing={{ enter: TRANSITION_EASING_IN, exit: TRANSITION_EASING_OUT }}
-      {...props}
-    />
-  );
-});
+// const Transition = forwardRef(function Transition(props, ref) {
+//   return (
+//     <Slide
+//       direction="up"
+//       ref={ref}
+//       timeout={{ enter: 600, exit: 400 }}
+//       easing={{ enter: TRANSITION_EASING_IN, exit: TRANSITION_EASING_OUT }}
+//       {...props}
+//     />
+//   );
+// });
 
 /* ───────── 2. ISOLATED COUNTDOWN (OPTIMIZED) ───────── */
 const TimeLeft = memo(({ target }) => {
@@ -335,7 +335,7 @@ function EventDetailsDialog({ open, event, onClose, Transition }) {
 const liveItemRef = useRef(null);
 const todayHeaderRef = useRef(null);
 
-const [collapsedDays, setCollapsedDays] = useState(() => new Set());
+// const [collapsedDays, setCollapsedDays] = useState(() => new Set());
 
 useEffect(() => {
   if (liveItemRef.current) {
@@ -351,91 +351,91 @@ useEffect(() => {
   }
 }, []);
 
-const getStageBounds = (items) => {
-  const starts = items.map(i => new Date(i.start).getTime());
-  const ends = items.map(i => new Date(i.end).getTime());
-  return {
-    start: new Date(Math.min(...starts)),
-    end: new Date(Math.max(...ends)),
-  };
-};
+// const getStageBounds = (items) => {
+//   const starts = items.map(i => new Date(i.start).getTime());
+//   const ends = items.map(i => new Date(i.end).getTime());
+//   return {
+//     start: new Date(Math.min(...starts)),
+//     end: new Date(Math.max(...ends)),
+//   };
+// };
 
-const getGroupBounds = (items) => {
-  const starts = items.map(i => new Date(i.start).getTime());
-  const ends = items.map(i => new Date(i.end).getTime());
+// const getGroupBounds = (items) => {
+//   const starts = items.map(i => new Date(i.start).getTime());
+//   const ends = items.map(i => new Date(i.end).getTime());
 
-  return {
-    start: new Date(Math.min(...starts)),
-    end: new Date(Math.max(...ends)),
-  };
-};
+//   return {
+//     start: new Date(Math.min(...starts)),
+//     end: new Date(Math.max(...ends)),
+//   };
+// };
 
-const getGroupStatus = (start, end) => {
-  const now = Date.now();
-  if (now < start.getTime()) return "UPCOMING";
-  if (now > end.getTime()) return "COMPLETED";
-  return "LIVE";
-};
+// const getGroupStatus = (start, end) => {
+//   const now = Date.now();
+//   if (now < start.getTime()) return "UPCOMING";
+//   if (now > end.getTime()) return "COMPLETED";
+//   return "LIVE";
+// };
 
-const STATUS_STYLES = {
-  LIVE: {
-    label: "LIVE",
-    bgcolor: "#6CFF8E",
-    color: "#000",
-    pulse: true,
-  },
-  UPCOMING: {
-    label: "UPCOMING",
-    bgcolor: "#E3F2FD",
-    color: "#1565C0",
-  },
-  COMPLETED: {
-    label: "COMPLETED",
-    bgcolor: "#EEEEEE",
-    color: "#616161",
-  },
-};
+// const STATUS_STYLES = {
+//   LIVE: {
+//     label: "LIVE",
+//     bgcolor: "#6CFF8E",
+//     color: "#000",
+//     pulse: true,
+//   },
+//   UPCOMING: {
+//     label: "UPCOMING",
+//     bgcolor: "#E3F2FD",
+//     color: "#1565C0",
+//   },
+//   COMPLETED: {
+//     label: "COMPLETED",
+//     bgcolor: "#EEEEEE",
+//     color: "#616161",
+//   },
+// };
 
 
 
-const groupedTimeline = useMemo(() => {
-    if (!event?.timeline) return [];
+// const groupedTimeline = useMemo(() => {
+//     if (!event?.timeline) return [];
 
-    // 1. Normalize strings to Date objects
-    const normalized = event.timeline
-      .map((item) => {
-        const startObj = new Date(item.start);
-        const endObj = new Date(item.end);
+//     // 1. Normalize strings to Date objects
+//     const normalized = event.timeline
+//       .map((item) => {
+//         const startObj = new Date(item.start);
+//         const endObj = new Date(item.end);
         
-        if (isNaN(startObj.getTime())) return null;
+//         if (isNaN(startObj.getTime())) return null;
 
-        return { 
-          ...item, 
-          startObj, 
-          endObj,
-          // Use start date as the grouping key (YYYY-MM-DD)
-          dateKey: startObj.toISOString().split("T")[0] 
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => a.startObj - b.startObj);
+//         return { 
+//           ...item, 
+//           startObj, 
+//           endObj,
+//           // Use start date as the grouping key (YYYY-MM-DD)
+//           dateKey: startObj.toISOString().split("T")[0] 
+//         };
+//       })
+//       .filter(Boolean)
+//       .sort((a, b) => a.startObj - b.startObj);
 
-    // 2. Group by dateKey
-    const groups = {};
-    normalized.forEach((item) => {
-      if (!groups[item.dateKey]) groups[item.dateKey] = [];
-      groups[item.dateKey].push(item);
-    });
+//     // 2. Group by dateKey
+//     const groups = {};
+//     normalized.forEach((item) => {
+//       if (!groups[item.dateKey]) groups[item.dateKey] = [];
+//       groups[item.dateKey].push(item);
+//     });
 
-    return Object.entries(groups).map(([dateKey, items]) => ({
-      dateKey,
-      dateObj: items[0].startObj,
-      items,
-      // The start of the first item and end of the last item defines the day's range
-      dayStart: items[0].startObj,
-      dayEnd: items[items.length - 1].endObj,
-    }));
-  }, [event]);
+//     return Object.entries(groups).map(([dateKey, items]) => ({
+//       dateKey,
+//       dateObj: items[0].startObj,
+//       items,
+//       // The start of the first item and end of the last item defines the day's range
+//       dayStart: items[0].startObj,
+//       dayEnd: items[items.length - 1].endObj,
+//     }));
+//   }, [event]);
 
   if (!event) return null;
 
