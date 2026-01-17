@@ -1,9 +1,3 @@
-import bg0 from "../assets/intro-wallps/intro-wallp-1.png";
-import bg1 from "../assets/intro-wallps/intro-wallp-2.png";
-import bg2 from "../assets/intro-wallps/intro-wallp-3.png";
-import bg3 from "../assets/intro-wallps/intro-wallp-1.png";
-import bg4 from "../assets/intro-wallps/intro-wallp-1.png";
-
 export const introScreens = [
   {
     id: 0,
