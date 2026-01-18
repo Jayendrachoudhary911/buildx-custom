@@ -654,7 +654,7 @@ useEffect(() => {
       </Typography>
 
       <Typography sx={{ fontSize: 15, opacity: 0.85, mb: 1 }}>
-        Jan 28, 2026 | 11:59 PM IST
+        Jan 30, 2026 | 11:59 PM IST
       </Typography>
 
       <Typography sx={{ fontSize: 14, opacity: 0.7, lineHeight: 1.6 }}>
