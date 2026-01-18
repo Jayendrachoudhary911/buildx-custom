@@ -1,7 +1,9 @@
 // src/sections/FinalCTASection.jsx
 import { Box, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function FinalCTASection() {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -62,6 +64,7 @@ export default function FinalCTASection() {
         <Button
           variant="contained"
           size="large"
+          onClick={() => navigate("/events")}
           sx={{
             px: 4,
             py: 1.4,

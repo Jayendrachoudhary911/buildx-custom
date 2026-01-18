@@ -22,6 +22,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { X, Calendar, MapPin, Globe, Clock, ShieldCheck, HelpCircle, ChevronDown } from "lucide-react";
 
 /* ───────── CONSTANTS ───────── */
@@ -113,6 +114,7 @@ const TimeLeft = memo(({ target }) => {
 const EventCard = memo(function EventCard({ event, onViewMore }) {
   const cardRef = useRef(null);
   const frame = useRef(null);
+  const navigate = useNavigate();
 
   const now = new Date();
 
@@ -297,6 +299,7 @@ const EventCard = memo(function EventCard({ event, onViewMore }) {
           {registrationStatus === "OPEN" && (
             <Button
               fullWidth
+              onClick={() => navigate("/design-event/register")}
               sx={{
                 py: 1.3,
                 borderRadius: 999,
@@ -334,6 +337,7 @@ function EventDetailsDialog({ open, event, onClose, Transition }) {
   const [expanded, setExpanded] = useState(false);
 const liveItemRef = useRef(null);
 const todayHeaderRef = useRef(null);
+const navigate = useNavigate();
 
 // const [collapsedDays, setCollapsedDays] = useState(() => new Set());
 
@@ -1009,6 +1013,7 @@ useEffect(() => {
 
           <Button
             fullWidth
+            onClick={() => navigate("/design-event/register")}
             sx={{
               py: 2.6,
               borderRadius: 1.3,
@@ -1040,6 +1045,7 @@ useEffect(() => {
 /* ───────── 5. MAIN SECTION ───────── */
 export default function EventSection() {
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const navigate = useNavigate();
 
 const events = useMemo(() => [
     {
@@ -1048,7 +1054,7 @@ const events = useMemo(() => [
       phase: "DESIGN",
       startDate: new Date("2026-02-01T10:00:00+05:30"),
       registrationOpensAt: new Date("2026-01-18T10:00:00+05:30"),
-      registrationClosesAt: new Date("2026-01-28T23:59:00+05:30"),
+      registrationClosesAt: new Date("2026-01-30T23:59:00+05:30"),
       image: "/assets/event-posters/design.png",
       short: `Understand real problems before writing code.
 Explore user needs, constraints, and real-world context.

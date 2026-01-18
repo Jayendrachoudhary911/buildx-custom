@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   { label: "Dev Event", id: "/dev-event", icon: Code2 },
 
   // Team management
-  { label: "Your Team", id: "/your-team", icon: Users },
+  // { label: "Your Team", id: "/your-team", icon: Users },
 
   // Contact / Support
   { label: "Contact Us", id: "/contact-us", icon: Mail },
@@ -506,10 +506,6 @@ useEffect(() => {
         {/* Example social icons */}
         <IconButton onClick={() => navigate("https://www.instagram.com/bunkmates.app/")} sx={{ color: "#fff", opacity: 0.7 }}>
           <Instagram size={18} />
-        </IconButton>
-
-        <IconButton sx={{ color: "#fff", opacity: 0.7 }}>
-          <FaDiscord size={18} />
         </IconButton>
 
         <IconButton onClick={() => navigate("https://www.linkedin.com/company/bunkmates/")} sx={{ color: "#fff", opacity: 0.7 }}>

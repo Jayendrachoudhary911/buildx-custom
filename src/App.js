@@ -7,8 +7,9 @@ import Home from "./pages/Home";
 import AppBackground from "./components/AppBackground";
 import ContactUs from "./pages/ContactUs";
 import EventsPage from "./pages/Events";
-import DesignEventPage from "./events/Design";
-import DevEventPage from "./events/Dev";
+import DesignEventPage from "./events/design-event/Design";
+import DesignRegistrationForm from "./events/design-event/RegistrationForm";
+import DevEventPage from "./events/dev-event/Dev";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -56,6 +57,7 @@ export default function App() {
         <Route path="/events" element={<EventsPage />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/design-event" element={<DesignEventPage />} />
+        <Route path="/design-event/register" element={<DesignRegistrationForm />} />
         <Route path="/dev-event" element={<DevEventPage />} />
       </Routes>
 

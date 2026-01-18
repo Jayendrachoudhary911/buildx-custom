@@ -188,10 +188,6 @@ const FOOTER_ITEMS = [
           <Instagram size={18} />
         </IconButton>
 
-        <IconButton sx={{ color: "#fff", opacity: 0.7 }}>
-          <FaDiscord size={18} />
-        </IconButton>
-
         <IconButton onClick={() => navigate("https://www.linkedin.com/company/bunkmates/")} sx={{ color: "#fff", opacity: 0.7 }}>
           <Linkedin size={18} />
         </IconButton>

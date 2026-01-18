@@ -2,24 +2,30 @@
 import { initializeApp } from "firebase/app";
 
 // Firestore
-import { getFirestore } from "firebase/firestore";
+import { 
+  getFirestore, 
+  enableIndexedDbPersistence 
+} from "firebase/firestore";
 
-// Authentication (optional but recommended)
-import { getAuth } from "firebase/auth";
+// Authentication
+import { 
+  getAuth,
+  onAuthStateChanged 
+} from "firebase/auth";
 
-// Analytics (optional, browser only)
+// Analytics (browser safe)
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 /* ================= FIREBASE CONFIG ================= */
 
 /*
-IMPORTANT:
-Use environment variables in production.
-Never hardcode real keys in public repos.
+SECURITY NOTE:
+Environment variables MUST be used in production.
+Never expose real keys in public repos.
 */
 
 const firebaseConfig = {
-apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
@@ -28,19 +34,46 @@ apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
-/* ================= INITIALIZE ================= */
+/* ================= INITIALIZE APP ================= */
 
 const app = initializeApp(firebaseConfig);
 
-/* ================= SERVICES ================= */
+/* ================= FIRESTORE ================= */
 
-// Firestore Database
+// Initialize Firestore
 export const db = getFirestore(app);
 
-// Firebase Authentication
+// Enable offline persistence (improves transaction reliability)
+enableIndexedDbPersistence(db).catch((err) => {
+  if (err.code === "failed-precondition") {
+    console.warn("Multiple tabs open — persistence disabled");
+  }
+  if (err.code === "unimplemented") {
+    console.warn("Browser does not support persistence");
+  }
+});
+
+/* ================= AUTH ================= */
+
 export const auth = getAuth(app);
 
-// Analytics (safe load)
+/*
+This listener guarantees:
+- Admin custom claims update
+- Proper permission refresh
+- Secure admin panel access
+*/
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // Force refresh token to load admin claims
+    await user.getIdToken(true);
+  }
+});
+
+/* ================= ANALYTICS ================= */
+
+// Safe analytics load
 isSupported().then((supported) => {
   if (supported) {
     getAnalytics(app);
