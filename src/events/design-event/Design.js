@@ -237,7 +237,7 @@ export default function BuildXDesignEvent() {
   {[
     {
       step: "Register",
-      desc: "Register individually or as a team via Unstop. Payment link will be shared after registration.",
+      desc: "Register individually or as a team. And pay their respective entry fees.",
     },
     {
       step: "Team Verification",

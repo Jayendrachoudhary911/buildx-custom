@@ -634,9 +634,8 @@ useEffect(() => {
       </Typography>
 
       <Typography sx={{ fontSize: 14, opacity: 0.7, lineHeight: 1.6 }}>
-        Participants can start registering on Unstop. Both individual and team
-        registrations are allowed. Once registered, participants will receive
-        payment instructions and further onboarding communication via email.
+        Participants can start registering on official web portal. Both individual and team
+        registrations are allowed. And pay their respective entry fees.
       </Typography>
     </Box>
 

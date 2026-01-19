@@ -17,8 +17,8 @@ import { motion } from "framer-motion";
 const designSteps = [
   {
     step: "01",
-    title: "Registration (via Unstop)",
-    desc: "Register individually or as a team on Unstop. Payment link will be sent to registered participants via email.",
+    title: "Registration",
+    desc: "Register individually or as a team on our web portal. And pay their respective entry fees.",
     icon: UserPlus,
   },
   {
