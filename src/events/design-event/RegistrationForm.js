@@ -713,8 +713,8 @@ Team Information
     handleTeamSize(Number(e.target.value))
   }
 >
-  <MenuItem value={2}>2 Members — ₹299</MenuItem>
-  <MenuItem value={3}>3 Members — ₹399</MenuItem>
+  <MenuItem value={2}>2 Members — ₹300</MenuItem>
+  <MenuItem value={3}>3 Members — ₹450</MenuItem>
 </TextField>
 
 {form.members.map((m, i) => (
@@ -852,7 +852,7 @@ Total Amount: ₹{priceInfo.price}
 Receiver Name
 </Typography>
 <Typography fontSize={13}>
-Jayendra Choudhary
+Mohit Sharma
 </Typography>
 </Box>
 
@@ -861,16 +861,25 @@ Jayendra Choudhary
 UPI ID
 </Typography>
 <Typography fontSize={13}>
-cjayendra911-1@okaxis
+mohitsharmahack810@oksbi
 </Typography>
 </Box>
 
-<Box display="flex" justifyContent="space-between">
+<Box display="flex" justifyContent="space-between" mb={1}>
 <Typography fontSize={13} color="#d5d5d5">
 Payment Note
 </Typography>
 <Typography fontSize={13}>
 BuildX - {form.teamName || "Team"}
+</Typography>
+</Box>
+
+<Box display="flex" justifyContent="space-between">
+<Typography fontSize={13} color="#d5d5d5">
+Note
+</Typography>
+<Typography varient="caption" fontSize={13} textAlign={"right"} width={250}>
+Make sure that your Transaction ID will be properly visible for faster verification.
 </Typography>
 </Box>
 
@@ -885,7 +894,6 @@ BuildX - {form.teamName || "Team"}
   alt="QR"
   style={{
     borderRadius: 10,
-    border: "1px solid #ffffff",
   }}
 />
 </Box>
