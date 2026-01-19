@@ -17,6 +17,7 @@ export default function Home() {
         sx={{
           color: "#fff",
           minHeight: "100vh",
+          backdropFilter: { xs : "blur(80px) brightness(2) saturate(1.9)", lg: "none" }
         }}
       >
         <HeroSection />
