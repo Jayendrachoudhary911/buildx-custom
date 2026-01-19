@@ -94,7 +94,7 @@ export default function HeroSection() {
   // const c = useSmoothCountdown(TARGET_DATE);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 8 }}>
+    <Container maxWidth="lg" sx={{ pt: 8 }}>
       <Box
         textAlign="center"
         py={{ xs: 27, md: 20 }}
