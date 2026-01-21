@@ -34,7 +34,7 @@ import { Calendar, MapPin, Clock, Globe, Instagram, MessageCircle, ExternalLink,
 const DRAFT_KEY = "event_registration_draft";
 
 const WEBHOOK_URL =
-  "https://script.google.com/macros/s/AKfycbwGGHu48gBOzsu3H0m0MSm3V2vFZl5tT2egSnrUIPy_ooZ6xFNuGdAWNJj0DwI1wMag/exec";
+  "https://script.google.com/macros/s/AKfycbzNdppzPfmCB-79Eq0mcfpprJSwx0ZP7DOe84zidilyqA2HkN-CEnlRIL0SRyH4DflA/exec";
 
 const pricingConfig = {
   2: { price: 300, qr: "/assets/images/QR/qr2.png" },
