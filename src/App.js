@@ -21,33 +21,52 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 export default function App() {
+
   const location = useLocation();
 
   const [booting, setBooting] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
 
-  /* ───────── BOOT ONLY ON HOME ROUTE ───────── */
+  /* ───────── ROUTE CHECKS ───────── */
+
+  const hideLayoutRoutes = [
+    "/team-login"
+  ];
+
+  const isTeamDashboardRoute = location.pathname.startsWith("/team-dashboard");
+
+  const shouldHideLayout =
+    hideLayoutRoutes.includes(location.pathname) ||
+    isTeamDashboardRoute;
+
+  /* ───────── BOOT ONLY ON HOME ───────── */
 
   useEffect(() => {
-    // Only trigger loading when landing on home
+
     if (location.pathname === "/") {
+
       const bootTimer = setTimeout(() => {
+
         setBooting(false);
 
         const seen =
           localStorage.getItem("buildx_intro_seen") === "true";
 
         setShowIntro(!seen);
+
       }, 4800);
 
       return () => clearTimeout(bootTimer);
+
     } else {
-      // Skip loading for all other routes
+
       setBooting(false);
+
     }
+
   }, [location.pathname]);
 
-  /* ───────── SHOW LOADING ONLY FOR HOME ───────── */
+  /* ───────── LOADING SCREEN ───────── */
 
   if (booting && location.pathname === "/") {
     return <LoadingScreen />;
@@ -55,36 +74,52 @@ export default function App() {
 
   return (
     <AppBackground>
-      <Navbar />
+
+      {/* NAVBAR (HIDDEN ON TEAM ROUTES) */}
+
+      {!shouldHideLayout && <Navbar />}
 
       <Routes>
+
         <Route path="/" element={<Home />} />
         <Route path="*" element={<Home />} />
+
         <Route path="/events" element={<EventsPage />} />
         <Route path="/contact-us" element={<ContactUs />} />
+
         <Route path="/design-event" element={<DesignEventPage />} />
         <Route path="/design-event/register" element={<DesignRegistrationForm />} />
+
         <Route path="/dev-event" element={<DevEventPage />} />
-        <Route path="/team-dashboard/:eventregistrationID" element={<TeamDashboard />} />
+
+        {/* TEAM FLOW */}
+
         <Route path="/team-login" element={<TeamLogin />} />
+        <Route path="/team-dashboard/:eventregistrationID" element={<TeamDashboard />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/team-settings/:eventregistrationID" element={<TeamSettings />} />
         <Route path="/team-pass/:eventregistrationID" element={<TeamPass />} />
         <Route path="/submission/:eventregistrationID" element={<ProjectSubmission />} />
+
       </Routes>
 
-      <Footer />
+      {/* FOOTER (HIDDEN ON TEAM ROUTES) */}
+
+      {!shouldHideLayout && <Footer />}
 
       {/* INTRO FLOW ONLY ON HOME */}
 
       {showIntro && location.pathname === "/" && (
+
         <IntroFlow
           onComplete={() => {
             localStorage.setItem("buildx_intro_seen", "true");
             setShowIntro(false);
           }}
         />
+
       )}
+
     </AppBackground>
   );
 }

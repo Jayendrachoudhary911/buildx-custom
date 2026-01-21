@@ -254,6 +254,7 @@ export default function RegistrationForm() {
         paymentStatus: "pending",
         pricePaid: pricingConfig[form.teamSize].price,
         createdAt: serverTimestamp(),
+        eventName: `BuildX CUSTOM - Design Hackathon`
       });
 
       await fetch(WEBHOOK_URL, {
@@ -268,6 +269,7 @@ export default function RegistrationForm() {
           teamSize: form.teamSize,
           price: pricingConfig[form.teamSize].price,
           members: form.members,
+          eventName: `BuildX CUSTOM - Design Hackathon`
         }),
       });
 
