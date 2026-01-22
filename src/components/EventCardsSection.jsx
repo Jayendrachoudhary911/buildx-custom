@@ -27,42 +27,76 @@ export default function EventCardsSection() {
         The Events
       </Typography>
 
-      <Grid container spacing={4}>
-        {events.map((event, index) => (
-          <Grid item xs={12} md={6} key={index}>
-            <Card
-              sx={{
-                height: "100%",
-                borderRadius: 3,
-                boxShadow: "0 12px 30px rgba(0,0,0,0.2)",
-                transition: "transform 0.3s ease",
-                "&:hover": {
-                  transform: "translateY(-6px)",
-                },
-              }}
-            >
-              {/* Event Image */}
-              <CardMedia
-                component="img"
-                height="220"
-                image={event.image}
-                alt={event.title}
-              />
+<Grid
+  container
+  spacing={{ xs: 2.5, sm: 3, md: 4 }}
+  sx={{
+    px: { xs: 1.5, sm: 2, md: 0 }, // outer spacing on mobile
+  }}
+>
+  {events.map((event, index) => (
+    <Grid item xs={12} md={6} key={index}>
+      <Card
+        sx={{
+          height: "100%",
+          borderRadius: 3,
 
-              {/* Content */}
-              <CardContent>
-                <Typography fontSize={18} fontWeight={600} mb={1}>
-                  {event.title}
-                </Typography>
+          boxShadow: "0 12px 30px rgba(0,0,0,0.2)",
 
-                <Typography fontSize={14} opacity={0.75} lineHeight={1.7}>
-                  {event.description}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+          transition: "all 0.3s ease",
+
+          display: "flex",
+          flexDirection: "column",
+
+          "&:hover": {
+            transform: "translateY(-6px)",
+          },
+        }}
+      >
+        {/* Event Image */}
+
+        <CardMedia
+          component="img"
+          image={event.image}
+          alt={event.title}
+          sx={{
+            height: { xs: 180, sm: 200, md: 220 },
+            objectFit: "cover",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+          }}
+        />
+
+        {/* Content */}
+
+        <CardContent
+          sx={{
+            flexGrow: 1,
+            px: { xs: 2, sm: 2.5 },
+            py: { xs: 2, sm: 2.5 },
+          }}
+        >
+          <Typography
+            fontSize={{ xs: 16, sm: 18 }}
+            fontWeight={600}
+            mb={1}
+          >
+            {event.title}
+          </Typography>
+
+          <Typography
+            fontSize={{ xs: 13.5, sm: 14 }}
+            opacity={0.75}
+            lineHeight={1.7}
+          >
+            {event.description}
+          </Typography>
+        </CardContent>
+      </Card>
+    </Grid>
+  ))}
+</Grid>
+
     </Box>
   );
 }

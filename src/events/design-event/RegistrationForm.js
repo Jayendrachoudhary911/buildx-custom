@@ -638,15 +638,11 @@ Team Leader Information
         },
 
         "& .MuiInputLabel-root": {
-          color: "#94a3b8",
-        },
-
-        "& .MuiInputLabel-root.Mui-focused": {
-          color: "#3b82f6",
-        },
+          color: "#d9d9d9",
+        }, 
 
         "& .MuiFormHelperText-root": {
-          color: "#94a3b8",
+          color: "#d9d9d9",
           fontSize: 12,
         },
       }}

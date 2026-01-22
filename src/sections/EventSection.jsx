@@ -21,6 +21,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Skeleton,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { X, Calendar, MapPin, Globe, Clock, ShieldCheck, HelpCircle, ChevronDown } from "lucide-react";
@@ -112,13 +113,12 @@ const TimeLeft = memo(({ target }) => {
 
 /* ───────── 3. EVENT CARD (SMOOTH PARALLAX) ───────── */
 const EventCard = memo(function EventCard({ event, onViewMore }) {
-  const cardRef = useRef(null);
-  const frame = useRef(null);
   const navigate = useNavigate();
 
   const now = new Date();
 
-  // ───────── REGISTRATION WINDOW LOGIC ─────────
+  /* ───────── REGISTRATION WINDOW LOGIC ───────── */
+
   const registrationOpensAt =
     event.registrationOpensAt ?? event.registrationOpensAt;
 
@@ -141,110 +141,92 @@ const EventCard = memo(function EventCard({ event, onViewMore }) {
     statusColor = "#FF7A7A";
   }
 
-  // ───────── MOUSE PARALLAX ─────────
-  const handleMouseMove = useCallback((e) => {
-    if (!cardRef.current) return;
-    if (frame.current) cancelAnimationFrame(frame.current);
-
-    frame.current = requestAnimationFrame(() => {
-      const rect = cardRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-      cardRef.current.style.setProperty("--x", x.toFixed(3));
-      cardRef.current.style.setProperty("--y", y.toFixed(3));
-    });
-  }, []);
-
-  const resetTilt = useCallback(() => {
-    if (!cardRef.current) return;
-    cardRef.current.style.setProperty("--x", 0);
-    cardRef.current.style.setProperty("--y", 0);
-  }, []);
-
   return (
     <Box
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={resetTilt}
       onClick={() => onViewMore(event)}
       sx={{
         position: "relative",
-        height: { xs: 480, md: 560 },
-        width: { xs: "80vw", md: 380 },
-        borderRadius: 3,
+
+        /* RESPONSIVE SIZE */
+        height: { xs: 460, sm: 420, md: 580 },
+        width: "100%",
+        maxWidth: { xs: "100%", sm: 430, md: 410 },
+
+        mx: "auto",
+        my: { xs: 2, sm: 3 },
+
+        borderRadius: 2,
+        overflow: "hidden",
+
         cursor: "pointer",
-        transform:
-          "perspective(1000px) rotateX(calc(var(--y) * -8deg)) rotateY(calc(var(--x) * 8deg))",
-        transition: "transform 0.2s ease-out, box-shadow 0.4s ease",
+
+        backgroundImage: `url(${event.image})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+
+        transition: "all 0.3s ease",
+
         "&:hover": {
-          boxShadow: "0 40px 100px rgba(0,0,0,0.7)",
-          "& .event-bg": {
-            transform:
-              "scale(1.12) translate(calc(var(--x) * -15px), calc(var(--y) * -15px))",
-          },
-          "& .title, & .viewMore": {
-            opacity: 1,
-            transform: "translateY(0)",
-          },
+          transform: { md: "translateY(-6px)" },
+          boxShadow: "0 20px 45px rgba(255, 255, 255, 0.17)",
         },
       }}
     >
-      {/* ───────── BACKGROUND ───────── */}
+      {/* ───────── DARK GRADIENT OVERLAY ───────── */}
+
       <Box
-        className="event-bg"
         sx={{
           position: "absolute",
-          inset: -20,
-          backgroundImage: `url(${event.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          borderRadius: 3,
-          transition: "transform 0.15s ease-out",
-          opacity: 0.85,
+          inset: 0,
+            backdropFilter: "blur(0px) saturate(1.8)",
+
+          zIndex: 1,
         }}
       />
 
       {/* ───────── CONTENT ───────── */}
+
       <Box
-        className="content"
         sx={{
-          position: "absolute",
-          bottom: { xs: 0, lg: -60 },
+          position: "relative",
           zIndex: 2,
-          p: { xs: 1.5, lg: 3.2 },
+
+          height: "100%",
+
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+
+          p: { xs: 2, sm: 2.5, md: 3 },
+
           color: "#fff",
-          width: "100%",
         }}
       >
         {/* TITLE */}
+
         <Typography
-          className="title"
-          fontSize={32}
-          fontWeight={600}
+          fontSize={{ xs: 18, sm: 20, md: 22 }}
+          fontWeight={700}
           mb={0.6}
-          sx={{
-            opacity: 0,
-            transform: "translateY(12px)",
-            transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
-          }}
         >
           {event.title}
         </Typography>
 
-        {/* COUNTDOWN (TO EVENT START) */}
-        <Box mb={1.2}>
+        {/* COUNTDOWN */}
+
+        <Box mb={1}>
           <TimeLeft target={event.startDate} />
         </Box>
 
-        {/* ───────── REGISTRATION STATUS ───────── */}
+        {/* STATUS */}
+
         <Typography
           fontSize={11}
           fontWeight={800}
           mb={1}
           sx={{
             color: statusColor,
-            letterSpacing: "0.14em",
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
           }}
         >
@@ -252,10 +234,13 @@ const EventCard = memo(function EventCard({ event, onViewMore }) {
         </Typography>
 
         {/* DESCRIPTION */}
+
         <Typography
-          fontSize={14}
+          fontSize={{ xs: 13.5, sm: 14 }}
           sx={{
-            opacity: 0.85,
+            opacity: 0.9,
+            lineHeight: 1.6,
+
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -265,18 +250,9 @@ const EventCard = memo(function EventCard({ event, onViewMore }) {
           {event.short}
         </Typography>
 
-        {/* ───────── CTA ───────── */}
-        <Box
-          className="viewMore"
-          sx={{
-            mt: 3,
-            display: "flex",
-            gap: 2,
-            opacity: 0,
-            transform: "translateY(12px)",
-            transition: "all 0.35s cubic-bezier(.16,1,.3,1)",
-          }}
-        >
+        {/* CTA BUTTONS */}
+
+        <Box mt={2} display="flex" gap={1.2}>
           <Button
             fullWidth
             onClick={(e) => {
@@ -284,13 +260,19 @@ const EventCard = memo(function EventCard({ event, onViewMore }) {
               onViewMore(event);
             }}
             sx={{
-              py: 1.3,
+              py: 1.1,
               borderRadius: 999,
               fontWeight: 600,
               textTransform: "none",
-              border: "1.5px solid rgba(255,255,255,0.3)",
-              backdropFilter: "blur(14px)",
+
+              border: "1px solid rgba(255,255,255,0.35)",
               color: "#fff",
+
+              backdropFilter: "blur(6px)",
+
+              "&:hover": {
+                background: "rgba(255,255,255,0.15)",
+              },
             }}
           >
             View More
@@ -299,13 +281,21 @@ const EventCard = memo(function EventCard({ event, onViewMore }) {
           {registrationStatus === "OPEN" && (
             <Button
               fullWidth
-              onClick={() => navigate("/design-event/register")}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/design-event/register");
+              }}
               sx={{
-                py: 1.3,
+                py: 1.1,
                 borderRadius: 999,
                 fontWeight: 600,
+
                 bgcolor: "#fff",
                 color: "#000",
+
+                "&:hover": {
+                  bgcolor: "#e5e7eb",
+                },
               }}
             >
               Register
@@ -1305,7 +1295,7 @@ original problem statement.`,
   return (
     <Box sx={{ bgcolor: "#00000000", color: "#fff", py: 10 }}>
       <Container maxWidth="lg">
-        <Typography variant="h3" fontWeight={800} mb={6}>
+        <Typography variant="h3" textAlign={"center"} fontWeight={800} mb={6}>
           The Events
         </Typography>
 
