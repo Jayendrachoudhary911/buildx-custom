@@ -9,6 +9,8 @@ import {
   Stepper,
   Step,
   StepLabel,
+  LinearProgress,
+  Alert, AlertTitle,
   Tooltip, InputAdornment, Autocomplete
 } from "@mui/material";
 import {
@@ -24,6 +26,7 @@ import {
 import { db } from "../../firebase";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import imageCompression from "browser-image-compression";
 import { Calendar, MapPin, Clock, Globe, Instagram, MessageCircle, ExternalLink, CheckCircle, Info,
   Share2,
@@ -34,7 +37,7 @@ import { Calendar, MapPin, Clock, Globe, Instagram, MessageCircle, ExternalLink,
 const DRAFT_KEY = "event_registration_draft";
 
 const WEBHOOK_URL =
-  "https://script.google.com/macros/s/AKfycbzNdppzPfmCB-79Eq0mcfpprJSwx0ZP7DOe84zidilyqA2HkN-CEnlRIL0SRyH4DflA/exec";
+  "https://script.google.com/macros/s/AKfycbwbl_P2OZRlp1VGbgyUrK1tvURnNohihBPAeBtJF4ZvwNy-3LnMFOIaGAjR079wsz5D/exec";
 
 const pricingConfig = {
   2: { price: 300, qr: "/assets/images/QR/qr2.png" },
@@ -85,6 +88,9 @@ export default function RegistrationForm() {
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [formError, setFormError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
 
   const initialState = {
     name: "",
@@ -177,29 +183,37 @@ export default function RegistrationForm() {
     setForm({ ...form, members: updated });
   };
 
-  const handleImage = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+const handleImage = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    try {
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.25,
-        maxWidthOrHeight: 900,
-        useWebWorker: true,
-      });
+  setUploading(true);
+  setUploadProgress(0);
 
-      const reader = new FileReader();
-      reader.onloadend = () =>
-        setForm((prev) => ({
-          ...prev,
-          screenshot: reader.result,
-        }));
+  const reader = new FileReader();
 
-      reader.readAsDataURL(compressed);
-    } catch {
-      alert("Image processing failed");
+  reader.onprogress = (event) => {
+    if (event.lengthComputable) {
+      const percent = Math.round((event.loaded / event.total) * 100);
+      setUploadProgress(percent);
     }
   };
+
+  reader.onloadend = () => {
+    setForm((prev) => ({
+      ...prev,
+      screenshot: reader.result,
+    }));
+
+    setTimeout(() => {
+      setUploading(false);
+      setUploadProgress(100);
+    }, 300);
+  };
+
+  reader.readAsDataURL(file);
+};
+
 
   /* ---------------- SUBMIT ---------------- */
 
@@ -562,43 +576,89 @@ Team Leader Information
   ].map(domain =>
     `${form.email.split("@")[0] || ""}@${domain}`
   )}
+
   onInputChange={(e, value) =>
     setForm({ ...form, email: value })
   }
+
+  slotProps={{
+    paper: {
+      sx: {
+        borderRadius: "14px",
+
+        background:
+          "linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.13))",
+
+        backdropFilter: "blur(28px)",
+        WebkitBackdropFilter: "blur(28px)",
+
+        border: "1px solid rgba(255,255,255,0.08)",
+
+        boxShadow:
+          "0 15px 40px rgba(0,0,0,0.45)",
+
+        overflow: "hidden",
+      },
+    },
+
+    popper: {
+      sx: {
+        zIndex: 1500,
+      },
+    },
+  }}
+
+  sx={{
+    mt: 2,
+
+    /* OPTION STYLE */
+    "& .MuiAutocomplete-option": {
+      fontSize: 14,
+      fontWeight: 600,
+      color: "#e5e7eb",
+      borderRadius: "10px",
+      margin: "6px 8px",
+    },
+  }}
+
   renderInput={(params) => (
     <TextField
       {...params}
       fullWidth
-      sx={{ mt: 2 }}
       label="Email Address"
       placeholder="example@gmail.com"
       helperText="Used for confirmation and certificates"
+
+      sx={{
+
+        "& input": {
+          color: "#fff",
+          fontWeight: 600,
+          padding: "14px",
+        },
+
+        "& .MuiInputLabel-root": {
+          color: "#94a3b8",
+        },
+
+        "& .MuiInputLabel-root.Mui-focused": {
+          color: "#3b82f6",
+        },
+
+        "& .MuiFormHelperText-root": {
+          color: "#94a3b8",
+          fontSize: 12,
+        },
+      }}
+
       InputProps={{
         ...params.InputProps,
-        endAdornment: (
-          <>
-            {emailRegex.test(form.email) && (
-              <CheckCircle size={18} color="#2e7d32" />
-            )}
-            <Tooltip
-              title={
-                <motion.span
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  Please use a valid email
-                </motion.span>
-              }
-            >
-              <Info size={16} style={{ marginLeft: 8 }} />
-            </Tooltip>
-            {params.InputProps.endAdornment}
-          </>
-        ),
       }}
     />
   )}
 />
+
+
 
 {/* Country Code Selector + Phone Auto Format */}
 
@@ -685,6 +745,7 @@ Continue to Team Details
 Team Information
 </Typography>
 
+
 <TextField
   fullWidth
   label="Team Name"
@@ -704,20 +765,230 @@ Team Information
   }}
 />
 
+<Alert
+  severity="info"
+  sx={{
+    my: 3,
+    borderRadius: "14px",
+
+    background:
+      "linear-gradient(135deg, rgba(59,130,246,0.18), rgba(59,130,246,0.05))",
+
+    border: "1px solid rgba(96,165,250,0.35)",
+
+    backdropFilter: "blur(14px)",
+    WebkitBackdropFilter: "blur(14px)",
+
+    position: "relative",
+    overflow: "hidden",
+
+    /* Left Accent Glow Strip */
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      left: 0,
+      top: 0,
+      height: "100%",
+      width: "5px",
+      background:
+        "linear-gradient(180deg, #3b82f6, #60a5fa)",
+      boxShadow: "0 0 14px rgba(59,130,246,0.8)",
+    },
+
+    "& .MuiAlert-icon": {
+      color: "#60a5fa",
+      fontSize: 22,
+      mt: "2px",
+    },
+
+    "& .MuiAlert-message": {
+      paddingRight: "8px",
+    },
+
+    transition: "all 0.3s ease",
+
+    "&:hover": {
+      transform: "translateY(-2px)",
+      boxShadow:
+        "0 15px 40px rgba(59,130,246,0.28)",
+    },
+  }}
+  action={
+    <Button
+      size="small"
+      variant="contained"
+      disableElevation
+      onClick={() => navigate("/contact-us")}
+      sx={{
+        background:
+          "linear-gradient(135deg, #3b82f6, #2563eb)",
+
+        color: "#fff",
+        borderRadius: 0.6,
+
+        px: 2,
+        py: 0.6,
+
+        fontSize: 12,
+        fontWeight: 600,
+        letterSpacing: "0.03em",
+
+        textTransform: "none",
+
+        transition: "all 0.25s ease",
+
+        "&:hover": {
+          transform: "translateY(-1px) scale(1.03)",
+          boxShadow:
+            "0 10px 22px rgba(37,99,235,0.6)",
+          background:
+            "linear-gradient(135deg, #2563eb, #1d4ed8)",
+        },
+
+        "&:active": {
+          transform: "scale(0.96)",
+        },
+      }}
+    >
+      Contact Organizers
+    </Button>
+  }
+>
+  <AlertTitle
+    sx={{
+      fontWeight: 800,
+      color: "#ffffff",
+      letterSpacing: "0.02em",
+      mb: 0.3,
+    }}
+  >
+    Solo Participant?
+  </AlertTitle>
+
+  <Typography
+    fontSize={13}
+    lineHeight={1.6}
+    sx={{ color: "#dbeafe" }}
+  >
+    Want to join alone? Reach out to our organizers and we'll help you get registered smoothly.
+  </Typography>
+</Alert>
+
 
 <TextField
   select
   fullWidth
-  sx={{ mt: 2 }}
   label="Team Size"
   value={form.teamSize}
   onChange={(e) =>
     handleTeamSize(Number(e.target.value))
   }
+  sx={{
+    mt: 2,
+
+    /* Label Styling */
+    "& .MuiInputLabel-root": {
+      color: "#94a3b8",
+      fontSize: 14,
+    },
+
+    /* Text Value */
+    "& .MuiSelect-select": {
+      color: "#fff",
+      fontWeight: 600,
+      py: 1.6,
+    },
+
+    /* Dropdown Arrow */
+    "& .MuiSvgIcon-root": {
+      color: "#ffffff",
+    },
+  }}
+
+  SelectProps={{
+    MenuProps: {
+      PaperProps: {
+        sx: {
+          mt: 1,
+          borderRadius: 1,
+
+          background:
+            "linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0))",
+
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+
+          border: "1px solid rgba(255,255,255,0.08)",
+
+          overflow: "hidden",
+        },
+      },
+
+      MenuListProps: {
+        sx: {
+          py: 0.5,
+        },
+      },
+    },
+  }}
 >
-  <MenuItem value={2}>2 Members — ₹300</MenuItem>
-  <MenuItem value={3}>3 Members — ₹450</MenuItem>
+  <MenuItem
+    value={2}
+    sx={{
+      fontSize: 14,
+      fontWeight: 600,
+      borderRadius: 0.5,
+      mx: 1,
+      my: 0.4,
+
+      color: "#e5e7eb",
+
+      "&:hover": {
+        background: "rgba(59,130,246,0.15)",
+      },
+
+      "&.Mui-selected": {
+        background: "rgba(59,130,246,0.25)",
+        color: "#fff",
+      },
+
+      "&.Mui-selected:hover": {
+        background: "rgba(59,130,246,0.35)",
+      },
+    }}
+  >
+    2 Members — ₹300
+  </MenuItem>
+
+  <MenuItem
+    value={3}
+    sx={{
+      fontSize: 14,
+      fontWeight: 600,
+      borderRadius: 1,
+      mx: 1,
+      my: 0.4,
+
+      color: "#e5e7eb",
+
+      "&:hover": {
+        background: "rgba(59,130,246,0.15)",
+      },
+
+      "&.Mui-selected": {
+        background: "rgba(59,130,246,0.25)",
+        color: "#fff",
+      },
+
+      "&.Mui-selected:hover": {
+        background: "rgba(59,130,246,0.35)",
+      },
+    }}
+  >
+    3 Members — ₹450
+  </MenuItem>
 </TextField>
+
 
 {form.members.map((m, i) => (
 <Box
@@ -758,23 +1029,27 @@ Team Member {i + 2}
 ))}
 
 <Box display="flex" gap={2} mt={3}>
-<Button fullWidth variant="outlined" onClick={() => setStep(1)}
-  sx={{
-  mt: 3,
-  px: 1,
-  py: 1.5,
-  borderRadius: 1,
-  border: "1px solid #fff",
-  color: "#ffffff",
-  boxShadow: "none",
-  transition: "all 0.3s ease-in-out",
 
-  "&:hover": {
-    backgroundColor: "#ffffff1c",
-    color: "#fff",
+<Button
+  fullWidth
+  variant="outlined"
+  onClick={() => setStep(1)}
+  sx={{
+    mt: 3,
+    px: 1,
+    py: 1.5,
+    borderRadius: 1,
+    border: "1px solid #fff",
+    color: "#ffffff",
     boxShadow: "none",
-  },
-}}
+    transition: "all 0.3s ease-in-out",
+
+    "&:hover": {
+      backgroundColor: "#ffffff1c",
+      color: "#fff",
+      boxShadow: "none",
+    },
+  }}
 >
 Back
 </Button>
@@ -792,28 +1067,29 @@ Back
     setFormError("");
     setStep(3);
   }}
-sx={{
-  mt: 3,
-  px: 1,
-  py: 1.5,
-  borderRadius: 1,
-  backgroundColor: "#fff",
-  color: "#000",
-  boxShadow: "none",
-  transition: "all 0.3s ease-in-out",
-
-  "&:hover": {
-    backgroundColor: "#000",
-    color: "#fff",
+  sx={{
+    mt: 3,
+    px: 1,
+    py: 1.5,
+    borderRadius: 1,
+    backgroundColor: "#fff",
+    color: "#000",
     boxShadow: "none",
-  },
-}}
+    transition: "all 0.3s ease-in-out",
+
+    "&:hover": {
+      backgroundColor: "#000",
+      color: "#fff",
+      boxShadow: "none",
+    },
+  }}
 >
 Continue to Payment
 </Button>
-</Box>
 
+</Box>
 </>
+
 )}
 
 {/* ================= STEP 3 ================= */}
@@ -1073,6 +1349,42 @@ Remove
 </Box>
 )}
 
+{/* UPLOAD PROGRESS BAR */}
+
+{uploading && (
+  <Box mt={2}>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      mb={0.5}
+    >
+      <Typography fontSize={12} color="#94a3b8">
+        Uploading Screenshot...
+      </Typography>
+
+      <Typography fontSize={12} color="#94a3b8">
+        {uploadProgress}%
+      </Typography>
+    </Box>
+
+    <LinearProgress
+      variant="determinate"
+      value={uploadProgress}
+      sx={{
+        height: 8,
+        borderRadius: 10,
+        backgroundColor: "rgba(255,255,255,0.08)",
+        "& .MuiLinearProgress-bar": {
+          borderRadius: 10,
+          background:
+            "linear-gradient(90deg, #22c55e, #4ade80)",
+        },
+      }}
+    />
+  </Box>
+)}
+
 
 {/* ACTION BUTTONS */}
 
@@ -1103,7 +1415,7 @@ Back
 
 <Button
   fullWidth
-  disabled={loading}
+  disabled={loading || uploading}
   variant="contained"
   color="success"
   onClick={handleSubmit}

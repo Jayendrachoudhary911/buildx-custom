@@ -207,7 +207,7 @@ export default function ContactUs() {
     {
       name: "Naman Soni",
       role: "Lead Organizer",
-      email: "soninamanp@gmail.com",
+      email: "soninamanp7@gmail.com",
       phone: "+91 9664464843",
       whatsapp: "9664464843",
     },

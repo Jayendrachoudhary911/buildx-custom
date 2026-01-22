@@ -42,10 +42,8 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [active, setActive] = useState("about");
-  // const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const lastScroll = useRef(0);
   const navRef = useRef(null);
   const indicatorRef = useRef(null);
   const itemRefs = useRef({});
@@ -54,21 +52,26 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  /* ───────── Unified Navigation Handler ───────── */
+
   const handleNavClick = (item) => {
-    // ROUTE navigation
+    // Close drawer FIRST (prevents visual lag)
+    setDrawerOpen(false);
+
+    // Route navigation
     if (item.id.startsWith("/")) {
       navigate(item.id);
       return;
     }
 
-    // SECTION scroll (only works on home)
+    // Section scroll handling
     if (location.pathname !== "/") {
-      navigate("/", { replace: false });
+      navigate("/");
       setTimeout(() => {
         document
           .getElementById(item.id)
           ?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+      }, 150);
     } else {
       document
         .getElementById(item.id)
@@ -76,56 +79,19 @@ export default function Navbar() {
     }
   };
 
-  useLayoutEffect(() => {
-  const el = itemRefs.current[active];
-  const indicator = indicatorRef.current;
-  if (!el || !indicator) return;
+  /* ───────── Scroll Styling ───────── */
 
-  const rect = el.getBoundingClientRect();
-  const parent = navRef.current.getBoundingClientRect();
-
-  indicator.style.width = `${rect.width}px`;
-  indicator.style.transform = `translateX(${rect.left - parent.left}px)`;
-}, [active]);
-
-
-/* ───────── Scroll behavior ───────── */
-useEffect(() => {
-  const onScroll = () => {
-    const current = window.scrollY;
-    
-    // We only care if the user has scrolled past a threshold (e.g., 20px)
-    // to toggle the background styling.
-    setScrolled(current > 20);
-    
-    // REMOVED: setHidden logic that slides the nav up/down
-    lastScroll.current = current;
-  };
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  return () => window.removeEventListener("scroll", onScroll);
-}, []);
-
-  /* ───────── Active section observer ───────── */
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive(e.target.id);
-        });
-      },
-      { threshold: 0.6 }
-    );
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
 
-    NAV_ITEMS.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ───────── Sliding underline ───────── */
+  /* ───────── Active Indicator ───────── */
+
   useLayoutEffect(() => {
     const el = itemRefs.current[active];
     const indicator = indicatorRef.current;
@@ -138,27 +104,31 @@ useEffect(() => {
     indicator.style.transform = `translateX(${rect.left - parent.left}px)`;
   }, [active]);
 
-  /* ───────── Keyboard navigation ───────── */
+  /* ───────── Keyboard Navigation ───────── */
+
   const onKeyDown = (e, index) => {
     if (e.key === "ArrowRight") {
       itemRefs.current[NAV_ITEMS[(index + 1) % NAV_ITEMS.length].id]?.focus();
     }
+
     if (e.key === "ArrowLeft") {
       itemRefs.current[
         NAV_ITEMS[(index - 1 + NAV_ITEMS.length) % NAV_ITEMS.length].id
       ]?.focus();
     }
-    if (e.key === "Enter") scrollTo(NAV_ITEMS[index].id);
+
+    if (e.key === "Enter") {
+      handleNavClick(NAV_ITEMS[index]);
+    }
   };
 
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+  /* ───────── External Social Redirect ───────── */
+
+  const handleExternalLink = (url) => {
     setDrawerOpen(false);
+    window.open(url, "_blank", "noopener,noreferrer");
   };
-
+  
   return (
     <>
       {/* ───────── NAVBAR ───────── */}
