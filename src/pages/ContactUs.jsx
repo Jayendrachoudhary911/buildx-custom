@@ -183,13 +183,13 @@ export default function ContactUs() {
   /* ---------- TEAM DATA ---------- */
 
   const team = [
-    {
-      name: "Jayendra Choudhary",
-      role: "Founder / Organizer",
-      email: "jayendrachoudhary911@gmail.com",
-      phone: "+91 7689919139",
-      whatsapp: "7689919139",
-    },
+    // {
+    //   name: "Jayendra Choudhary",
+    //   role: "Founder / Organizer",
+    //   email: "jayendrachoudhary911@gmail.com",
+    //   phone: "+91 7689919139",
+    //   whatsapp: "7689919139",
+    // },
     {
       name: "Mohit Sharma",
       role: "Founder / Organizer",
