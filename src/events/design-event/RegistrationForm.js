@@ -318,6 +318,7 @@ const handleImage = (e) => {
 <Box
   mb={3}
   p={2.5}
+  px={0}
   borderRadius={2}
   sx={{
     background:
@@ -354,11 +355,20 @@ problems and compete for exciting prizes.
   mt={2}
 >
 
+<Box display="flex" alignItems="center" gap={0.7} sx={{ px: 0.5, py: 0.5, borderRadius: 3, backgroundColor: "#f1f1f111" }}>
+<Box display="flex" alignItems="center" gap={0.7} sx={{ px: 1.5, py: 0.5, borderRadius: 3 }}>
+  <Calendar size={16} />
+  <Typography fontSize={13}>
+    Event Date: Feb 01, 2026
+  </Typography>
+</Box>
+
 <Box display="flex" alignItems="center" gap={0.7} sx={{ px: 1.5, py: 0.5, borderRadius: 3, backgroundColor: "#f1f1f111" }}>
   <Calendar size={16} />
   <Typography fontSize={13}>
-    Feb 18 – Feb 30, 2026
+    Registration Ends: Jan 30, 2026
   </Typography>
+</Box>
 </Box>
 
 <Box display="flex" alignItems="center" gap={0.7} sx={{ px: 1.5, py: 0.5, borderRadius: 3, backgroundColor: "#f1f1f111" }}>
