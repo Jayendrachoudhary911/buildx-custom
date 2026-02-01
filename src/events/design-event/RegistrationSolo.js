@@ -40,6 +40,7 @@ const WEBHOOK_URL =
   "https://script.google.com/macros/s/AKfycbwbl_P2OZRlp1VGbgyUrK1tvURnNohihBPAeBtJF4ZvwNy-3LnMFOIaGAjR079wsz5D/exec";
 
 const pricingConfig = {
+  1: { price: 150, qr: "/assets/images/QR/qr2.png" },
   2: { price: 300, qr: "/assets/images/QR/qr2.png" },
   3: { price: 450, qr: "/assets/images/QR/qr3.png" },
 };
@@ -359,14 +360,14 @@ problems and compete for exciting prizes.
 <Box display="flex" alignItems="center" gap={0.7} sx={{ px: 1.5, py: 0.5, borderRadius: 3 }}>
   <Calendar size={16} />
   <Typography fontSize={13}>
-    Event Date: Feb 07, 2026
+    Event Date: Feb 01, 2026
   </Typography>
 </Box>
 
 <Box display="flex" alignItems="center" gap={0.7} sx={{ px: 1.5, py: 0.5, borderRadius: 3, backgroundColor: "#f1f1f111" }}>
   <Calendar size={16} />
   <Typography fontSize={13}>
-    Registration Ends: Feb 05, 2026
+    Registration Ends: Jan 30, 2026
   </Typography>
 </Box>
 </Box>
@@ -938,6 +939,33 @@ Team Information
     },
   }}
 >
+    <MenuItem
+    value={1}
+    sx={{
+      fontSize: 14,
+      fontWeight: 600,
+      borderRadius: 0.5,
+      mx: 1,
+      my: 0.4,
+
+      color: "#e5e7eb",
+
+      "&:hover": {
+        background: "rgba(59,130,246,0.15)",
+      },
+
+      "&.Mui-selected": {
+        background: "rgba(59,130,246,0.25)",
+        color: "#fff",
+      },
+
+      "&.Mui-selected:hover": {
+        background: "rgba(59,130,246,0.35)",
+      },
+    }}
+  >
+    1 Member — ₹150
+  </MenuItem>
   <MenuItem
     value={2}
     sx={{

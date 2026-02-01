@@ -9,6 +9,7 @@ import ContactUs from "./pages/ContactUs";
 import EventsPage from "./pages/Events";
 import DesignEventPage from "./events/design-event/Design";
 import DesignRegistrationForm from "./events/design-event/RegistrationForm";
+import DesignRegistrationSolo from "./events/design-event/RegistrationSolo";
 import DevEventPage from "./events/dev-event/Dev";
 import TeamDashboard from "./events/team-dashboard/TeamDashboard";
 import TeamLogin from "./events/team-dashboard/TeamLogin";
@@ -89,6 +90,7 @@ export default function App() {
 
         <Route path="/design-event" element={<DesignEventPage />} />
         <Route path="/design-event/register" element={<DesignRegistrationForm />} />
+        <Route path="/design-event/a/solo-participant/registration" element={<DesignRegistrationSolo />} />
 
         <Route path="/dev-event" element={<DevEventPage />} />
 
