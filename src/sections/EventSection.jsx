@@ -1043,7 +1043,7 @@ const events = useMemo(() => [
       phase: "DESIGN",
       startDate: new Date("2026-02-07T10:00:00+05:30"),
       registrationOpensAt: new Date("2026-01-18T10:00:00+05:30"),
-      registrationClosesAt: new Date("2026-02-05T23:59:00+05:30"),
+      registrationClosesAt: new Date("2026-02-06T23:59:00+05:30"),
       image: "/assets/event-posters/design.png",
       short: `Understand real problems before writing code.
 Explore user needs, constraints, and real-world context.
@@ -1067,15 +1067,15 @@ timeline: [
     stage: "registration",
     dateKey: "2026-01-18",
     dateObj: new Date("2026-01-18T00:00:00+05:30"),
-    rangeLabel: "18 Jan 26 → 05 Feb 26",
+    rangeLabel: "18 Jan 26 → 06 Feb 26",
     items: [
       {
         title: "Registration Window",
         desc: "Participants can register for BuildX Design during this period.",
-        timeRange: "17 Jan 26, 12:00 AM IST → 28 Jan 26, 11:59 PM IST",
+        timeRange: "17 Jan 26, 12:00 AM IST → 06 Feb 26, 11:59 PM IST",
         platform: "Online",
         start: "2026-01-17T00:00:00+05:30",
-        end: "2026-01-28T23:59:59+05:30",
+        end: "2026-02-06T23:59:59+05:30",
       },
     ],
   },

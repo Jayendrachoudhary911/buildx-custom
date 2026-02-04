@@ -366,7 +366,7 @@ problems and compete for exciting prizes.
 <Box display="flex" alignItems="center" gap={0.7} sx={{ px: 1.5, py: 0.5, borderRadius: 3, backgroundColor: "#f1f1f111" }}>
   <Calendar size={16} />
   <Typography fontSize={13}>
-    Registration Ends: Feb 05, 2026
+    Registration Ends: Feb 06, 2026
   </Typography>
 </Box>
 </Box>

@@ -216,9 +216,9 @@ export default function BuildXDesignEvent() {
         <Grid container spacing={3} mb={10}>
           {[
             ["Registration Opens", "Jan 18, 2026 — 10:00 AM IST"],
-            ["Registration Closes", "Jan 30, 2026 — 11:59 PM IST"],
-            ["Event Starts", "Feb 1, 2026 — 9:30 AM IST"],
-            ["Event Ends", "Feb 2, 2026 — 10:00 AM IST"],
+            ["Registration Closes", "Feb 06, 2026 — 11:59 PM IST"],
+            ["Event Starts", "Feb 07, 2026 — 9:30 AM IST"],
+            ["Event Ends", "Feb 08, 2026 — 10:00 AM IST"],
           ].map((t, i) => (
             <Grid item xs={12} sm={6} key={i}>
               <GlassCard>
