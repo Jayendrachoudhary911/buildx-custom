@@ -643,7 +643,7 @@ useEffect(() => {
       </Typography>
 
       <Typography sx={{ fontSize: 15, opacity: 0.85, mb: 1 }}>
-        Jan 30, 2026 | 11:59 PM IST
+        Feb 06, 2026 | 11:59 PM IST
       </Typography>
 
       <Typography sx={{ fontSize: 14, opacity: 0.7, lineHeight: 1.6 }}>
@@ -667,7 +667,7 @@ useEffect(() => {
       </Typography>
 
       <Typography sx={{ fontSize: 15, opacity: 0.9, mb: 1 }}>
-        Sunday, Feb 1, 2026 | 9:30 AM IST
+        Sunday, Feb 07, 2026 | 12:30 PM IST
       </Typography>
 
       <Typography sx={{ fontSize: 14, opacity: 0.75, lineHeight: 1.6 }}>
@@ -692,7 +692,7 @@ useEffect(() => {
       </Typography>
 
       <Typography sx={{ fontSize: 15, opacity: 0.9, mb: 1 }}>
-        Monday, Feb 2, 2026 | 10:00 AM IST
+        Monday, Feb 08, 2026 | 01:00 PM IST
       </Typography>
 
       <Typography sx={{ fontSize: 14, opacity: 0.75, lineHeight: 1.6 }}>
@@ -1041,7 +1041,7 @@ const events = useMemo(() => [
       id: "buildx-design",
       title: "BuildX Design",
       phase: "DESIGN",
-      startDate: new Date("2026-02-07T10:00:00+05:30"),
+      startDate: new Date("2026-02-07T12:30:00+05:30"),
       registrationOpensAt: new Date("2026-01-18T10:00:00+05:30"),
       registrationClosesAt: new Date("2026-02-06T23:59:00+05:30"),
       image: "/assets/event-posters/design.png",
@@ -1085,14 +1085,14 @@ timeline: [
     stage: "event",
     dateKey: "2026-02-07",
     dateObj: new Date("2026-02-07T00:00:00+05:30"),
-    rangeLabel: "07 Feb 26, 09:30 AM → 08 Feb 26, 12:00 AM",
+    rangeLabel: "07 Feb 26, 12:30 PM → 08 Feb 26, 01:00 PM",
     items: [
       {
         title: "BuildX Design Begins",
         desc: "Opening of the Design Phase.",
-        timeRange: "09:30 AM IST",
-        start: "2026-02-07T09:30:00+05:30",
-        end: "2026-02-07T09:30:00+05:30",
+        timeRange: "12:30 PM IST",
+        start: "2026-02-07T12:30:00+05:30",
+        end: "2026-02-07T12:30:00+05:30",
       },
       {
         title: "Opening & Orientation",
@@ -1137,7 +1137,7 @@ timeline: [
     stage: "event",
     dateKey: "2026-02-08",
     dateObj: new Date("2026-02-08T00:00:00+05:30"),
-    rangeLabel: "08 Feb 26, 12:00 AM → 10:00 AM",
+    rangeLabel: "08 Feb 26, 12:00 AM → 01:00 PM",
     items: [
       {
         title: "Phase 2 – Designing",
