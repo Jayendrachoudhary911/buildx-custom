@@ -153,7 +153,7 @@ export default function HeroSection() {
         {/* CTA - Higher Contrast for "Cool" Factor */}
         <Button
           variant="contained"
-          onClick={() => navigate("/events")}
+          onClick={() => navigate("/problem-statement")}
           sx={{
             px: 6,
             py: 1.8,
@@ -170,7 +170,7 @@ export default function HeroSection() {
             },
           }}
         >
-          Register Now
+          Problem Statements
         </Button>
       </Box>
     </Container>

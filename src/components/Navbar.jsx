@@ -254,7 +254,7 @@ export default function Navbar() {
         {/* CTA + MOBILE */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Button
-            onClick={() => navigate("/events")}
+            onClick={() => navigate("/problem-statement")}
             sx={{
               px: 3,
               py: 0.8,
@@ -269,7 +269,7 @@ export default function Navbar() {
               },
             }}
           >
-            Register Now
+            Problem Statements
           </Button>
 
           <IconButton

@@ -17,6 +17,8 @@ import TeamPass from "./events/team-dashboard/TeamPass";
 import TeamSettings from "./events/team-dashboard/TeamSettings";
 import Leaderboard from "./events/team-dashboard/Leaderboard";
 import ProjectSubmission from "./events/team-dashboard/ProjectSubmission";
+import ProblemStatements from "./pages/ProblemStatements";
+import ProblemDetail from "./pages/ProblemDetail";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -34,10 +36,18 @@ export default function App() {
     "/team-login"
   ];
 
+  const hideFooterRoutes = [
+    "/problems"
+  ];
+
   const isTeamDashboardRoute = location.pathname.startsWith("/team-dashboard");
 
   const shouldHideLayout =
     hideLayoutRoutes.includes(location.pathname) ||
+    isTeamDashboardRoute;
+
+  const shouldHideFooter =
+    hideFooterRoutes.includes(location.pathname) ||
     isTeamDashboardRoute;
 
   /* ───────── BOOT ONLY ON HOME ───────── */
@@ -87,6 +97,8 @@ export default function App() {
 
         <Route path="/events" element={<EventsPage />} />
         <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/problems" element={<ProblemStatements />} />
+        <Route path="/problem/:problemId" element={<ProblemDetail />} />
 
         <Route path="/design-event" element={<DesignEventPage />} />
         <Route path="/design-event/a/solo-participant/registration" element={<DesignRegistrationSolo />} />
@@ -106,7 +118,7 @@ export default function App() {
 
       {/* FOOTER (HIDDEN ON TEAM ROUTES) */}
 
-      {!shouldHideLayout && <Footer />}
+      {!shouldHideLayout && !shouldHideFooter && <Footer />}
 
       {/* INTRO FLOW ONLY ON HOME */}
 
