@@ -192,6 +192,7 @@ export default function Problems() {
     alignItems: "center",
     justifyContent: "center",
     mt: 10,
+    width: "100%",
   }}
 >
   <Box
@@ -213,7 +214,7 @@ export default function Problems() {
       boxShadow:
         "none",
 
-      maxWidth: "50vw",
+      maxWidth: { xs: "100%", sm: 480 },
       width: "100%",
     }}
   >
@@ -481,7 +482,7 @@ export default function Problems() {
       display: "flex",
       flexDirection: "column",
 
-      overflow: "hidden",
+      overflow: "auto",
     },
   }}
 >
