@@ -89,7 +89,6 @@ export default function App() {
         <Route path="/contact-us" element={<ContactUs />} />
 
         <Route path="/design-event" element={<DesignEventPage />} />
-        <Route path="/design-event/register" element={<DesignRegistrationForm />} />
         <Route path="/design-event/a/solo-participant/registration" element={<DesignRegistrationSolo />} />
 
         <Route path="/dev-event" element={<DevEventPage />} />
