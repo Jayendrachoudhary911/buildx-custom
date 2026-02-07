@@ -341,116 +341,135 @@ export default function Problems() {
       gap: 3,
     }}
   >
-    {problems.map((problem) => (
-      <Card
-        key={problem.id}
-        onClick={() => handleOpenDrawer(problem)}
-        sx={{
-          position: "relative",
-          cursor: "pointer",
+{problems.map((problem, index) => (
+  <Card
+    key={problem.id}
+    onClick={() => handleOpenDrawer(problem)}
+    sx={{
+      position: "relative",
+      cursor: "pointer",
 
-          // Glass surface
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))",
+      background:
+        "linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))",
 
-          backdropFilter: "blur(12px)",
-          boxShadow: "none",
+      backdropFilter: "blur(12px)",
+      boxShadow: "none",
 
-          border:
-            "1px solid rgba(255,255,255,0.08)",
+      border: "1px solid rgba(255,255,255,0.08)",
+      borderRadius: 2,
 
-          borderRadius: 2,
+      p: 0.5,
+      overflow: "hidden",
 
-          p: 0.5,
+      transition: "all 0.35s ease",
 
-          transition: "all 0.35s ease",
+      "&:hover": {
+        transform: "translateY(-6px) scale(1.01)",
 
-          // Hover effects
-          "&:hover": {
-            transform: "translateY(-6px) scale(1.01)",
+        boxShadow:
+          "0 20px 60px rgba(255, 255, 255, 0.19), 0 0 0 1px rgba(255, 255, 255, 0.08)",
 
-            boxShadow:
-              "0 20px 60px rgba(255, 255, 255, 0.19), 0 0 0 1px rgba(255, 255, 255, 0.08)",
+        border:
+          "1px solid rgba(180,180,255,0.35)",
+      },
+    }}
+  >
+    {/* 🔢 Watermark Number */}
+    <Box
+      sx={{
+        position: "absolute",
+        top: -10,
+        right: 10,
 
-            border:
-              "1px solid rgba(180,180,255,0.35)",
-          },
-        }}
+        fontSize: 120,
+        fontWeight: 900,
+        lineHeight: 1,
+
+        color: "rgba(255,255,255,0.06)",
+
+        userSelect: "none",
+        pointerEvents: "none",
+
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02))",
+
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+
+        filter:
+          "blur(0.3px) drop-shadow(0 6px 18px rgba(0,0,0,0.6))",
+      }}
+    >
+      {(index + 1).toString().padStart(2, "0")}
+    </Box>
+
+    <CardContent sx={{ p: 3, position: "relative" }}>
+      {/* Title */}
+      <Typography
+        variant="h5"
+        fontWeight={800}
+        sx={{ lineHeight: 1.3 }}
       >
-        <CardContent
+        {problem.title}
+      </Typography>
+
+      {/* Twist Badge */}
+      {problem.twist && (
+        <Box
           sx={{
-            p: 3,
+            mt: 1.5,
+            display: "inline-block",
+            px: 1.5,
+            py: 0.7,
+            borderRadius: 0.5,
+            fontSize: 12,
+            fontWeight: 600,
+
+            background:
+              "linear-gradient(90deg, #df9204a3, #dbb2667b)",
+
+            color: "#fff",
           }}
         >
-          {/* Title */}
-          <Typography
-            variant="h5"
-            fontWeight={800}
-            sx={{
-              lineHeight: 1.3,
-            }}
-          >
-            {problem.title}
-          </Typography>
+          ✦ {problem.twist}
+        </Box>
+      )}
 
-          {/* Twist Badge */}
-          {problem.twist && (
-            <Box
-              sx={{
-                mt: 1.5,
-                display: "inline-block",
-                px: 1.5,
-                py: 0.7,
-                borderRadius: 0.5,
-                fontSize: 12,
-                fontWeight: 600,
+      <Divider
+        sx={{
+          my: 2.5,
+          borderColor:
+            "rgba(255,255,255,0.08)",
+        }}
+      />
 
-                background:
-                  "linear-gradient(90deg, #df9204a3, #dbb2667b)",
+      {/* Statement Preview */}
+      <Typography
+        sx={{
+          lineHeight: 1.75,
+          color: "rgba(255,255,255,0.75)",
 
-                color: "#fff",
-                boxShadow:
-                  "0 4px 14px rgba(255, 223, 97, 0)",
-              }}
-            >
-              ✦ {problem.twist}
-            </Box>
-          )}
+          display: "-webkit-box",
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
+        {problem.problemStatement}
+      </Typography>
 
-          <Divider
-            sx={{
-              my: 2.5,
-              borderColor:
-                "rgba(255,255,255,0.08)",
-            }}
-          />
+      {/* Footer Hint */}
+      <Typography
+        mt={3}
+        fontSize={12}
+        color="rgba(255,255,255,0.4)"
+      >
+        Click to view full brief →
+      </Typography>
+    </CardContent>
+  </Card>
+))}
 
-          {/* Statement Preview */}
-          <Typography
-            sx={{
-              lineHeight: 1.75,
-              color: "rgba(255,255,255,0.75)",
-
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {problem.problemStatement}
-          </Typography>
-
-          {/* Footer Hint */}
-          <Typography
-            mt={3}
-            fontSize={12}
-            color="rgba(255,255,255,0.4)"
-          >
-            Click to view full brief →
-          </Typography>
-        </CardContent>
-      </Card>
-    ))}
   </Box>
 </Container>
 
