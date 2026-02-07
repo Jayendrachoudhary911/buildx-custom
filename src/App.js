@@ -110,17 +110,6 @@ export default function App() {
 
       {/* INTRO FLOW ONLY ON HOME */}
 
-      {showIntro && location.pathname === "/" && (
-
-        <IntroFlow
-          onComplete={() => {
-            localStorage.setItem("buildx_intro_seen", "true");
-            setShowIntro(false);
-          }}
-        />
-
-      )}
-
     </AppBackground>
   );
 }
