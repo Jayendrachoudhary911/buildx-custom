@@ -153,7 +153,7 @@ export default function HeroSection() {
         {/* CTA - Higher Contrast for "Cool" Factor */}
         <Button
           variant="contained"
-          onClick={() => navigate("/problem-statement")}
+          onClick={() => navigate("/problems")}
           sx={{
             px: 6,
             py: 1.8,

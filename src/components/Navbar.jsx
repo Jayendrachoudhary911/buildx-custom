@@ -254,7 +254,7 @@ export default function Navbar() {
         {/* CTA + MOBILE */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Button
-            onClick={() => navigate("/problem-statement")}
+            onClick={() => navigate("/problems")}
             sx={{
               px: 3,
               py: 0.8,
